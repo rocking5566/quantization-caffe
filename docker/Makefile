@@ -10,8 +10,7 @@ X11_DISPLAY=--env DISPLAY=$(DISPLAY) \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:ro
 
 MOUNT_DIR=-v $(REPO_ROOT):/workspace \
-	-v $(DATA):/data \
-	-v /home/rocking/work/cvitek/onnx2caffe:/onnx2caffe
+	-v $(DATA):/data
 
 MOUNT_WEBCAM=--device /dev/video0:/dev/video0
 
