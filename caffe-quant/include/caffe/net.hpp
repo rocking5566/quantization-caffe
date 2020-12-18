@@ -28,6 +28,9 @@ class Net {
       const int level = 0, const vector<string>* stages = NULL);
   virtual ~Net() {}
 
+  // Quantization related funtion
+  void ImportActivationRange(const string& threshold_table_path);
+
   /// @brief Initialize a network with a NetParameter.
   void Init(const NetParameter& param);
 
@@ -335,6 +338,9 @@ class Net {
   vector<Callback*> after_forward_;
   vector<Callback*> before_backward_;
   vector<Callback*> after_backward_;
+
+  /// Quantization
+  map<string, float> range_map;
 
 DISABLE_COPY_AND_ASSIGN(Net);
 };

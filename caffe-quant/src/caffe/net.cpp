@@ -4,6 +4,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
+#include <regex>
+#include <sstream>
 
 #ifdef USE_HDF5
 #include "hdf5.h"
@@ -40,6 +43,33 @@ Net<Dtype>::Net(const string& param_file, Phase phase,
   }
   param.mutable_state()->set_level(level);
   Init(param);
+}
+
+template <typename Dtype>
+void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
+  std::ifstream infile(threshold_table_path);
+  string line;
+  std::regex sym_pattern("[a-zA-Z0-9.:;_\\/-]+ [-0-9.e]+");
+  std::regex asym_pattern("[a-zA-Z0-9.:;_\\/-]+ [-0-9.e]+ [-0-9.e]+");
+  while (getline(infile, line)) {
+    std::istringstream iss(line);
+    string layer_name;
+    if (regex_match(line, sym_pattern)) {
+        float threshold = 0;
+        if (!(iss >> layer_name >> threshold)) { break; }
+        shared_ptr<Layer<Dtype> > layer_ptr = layer_by_name(layer_name);
+        if (layer_ptr != NULL) {
+          int layer_id = layer_names_index_[layer_name];
+          for (int i = 0; i < bottom_vecs_[layer_id].size(); ++i) {
+            bottom_vecs_[layer_id][i]->SetQuantizationRange(threshold, -threshold);
+          }
+        }
+      } else if (regex_match(line, asym_pattern)) {
+        LOG(FATAL) << "Not Support asymmetric quantization so far";
+      } else {
+        LOG(FATAL) << line << std::endl << "not match required format";
+      }
+  }
 }
 
 template <typename Dtype>

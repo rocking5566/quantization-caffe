@@ -411,6 +411,7 @@ BOOST_PYTHON_MODULE(_caffe) {
             bp::arg("weights")=bp::object())))
     // Legacy constructor
     .def("__init__", bp::make_constructor(&Net_Init_Load))
+    .def("import_activation_range", &Net<Dtype>::ImportActivationRange)
     .def("_forward", &Net<Dtype>::ForwardFromTo)
     .def("_backward", &Net<Dtype>::BackwardFromTo)
     .def("reshape", &Net<Dtype>::Reshape)

@@ -48,6 +48,8 @@ caffe_option(USE_HDF5 "Build with hdf5" ON)
 # ---[ Dependencies
 include(cmake/Dependencies.cmake)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # ---[ Flags
 if(UNIX OR APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
