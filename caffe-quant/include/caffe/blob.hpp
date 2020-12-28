@@ -24,7 +24,7 @@ template <typename Dtype>
 class Blob {
  public:
   Blob()
-       : data_(), diff_(), count_(0), capacity_(0), max_(0), min_(0) {}
+       : data_(), diff_(), count_(0), capacity_(0) {}
 
   /// @brief Deprecated; use <code>Blob(const vector<int>& shape)</code>.
   explicit Blob(const int num, const int channels, const int height,
@@ -266,6 +266,7 @@ class Blob {
 
   bool ShapeEquals(const BlobProto& other);
   void SetQuantizationRange(Dtype max, Dtype min);
+  void SetQuantizationRange(const vector<Dtype>& max, const vector<Dtype>& min);
 
  protected:
   shared_ptr<SyncedMemory> data_;
@@ -275,8 +276,8 @@ class Blob {
   int count_;
   int capacity_;
 
-  Dtype max_;
-  Dtype min_;
+  vector<Dtype> max_;
+  vector<Dtype> min_;
 
   DISABLE_COPY_AND_ASSIGN(Blob);
 };  // class Blob

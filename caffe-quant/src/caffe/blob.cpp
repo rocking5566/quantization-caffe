@@ -63,18 +63,14 @@ template <typename Dtype>
 Blob<Dtype>::Blob(const int num, const int channels, const int height,
     const int width)
   // capacity_ must be initialized before calling Reshape
-  : capacity_(0),
-    min_(0),
-    max_(0) {
+  : capacity_(0) {
   Reshape(num, channels, height, width);
 }
 
 template <typename Dtype>
 Blob<Dtype>::Blob(const vector<int>& shape)
   // capacity_ must be initialized before calling Reshape
-  : capacity_(0),
-    min_(0),
-    max_(0) {
+  : capacity_(0) {
   Reshape(shape);
 }
 
@@ -560,6 +556,15 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
 template <typename Dtype>
 void Blob<Dtype>::SetQuantizationRange(Dtype max, Dtype min) {
   LOG_IF(FATAL, max != -min) << "only support symmetric quantization so far";
+  max_ = { max };
+  min_ = { min };
+}
+
+template <typename Dtype>
+void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& max, const vector<Dtype>& min) {
+  for (int i = 0; i < max.size(); ++i)
+    LOG_IF(FATAL, max[i] != -min[i]) << "only support symmetric quantization so far";
+
   max_ = max;
   min_ = min;
 }
