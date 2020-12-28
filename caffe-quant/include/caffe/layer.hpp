@@ -38,7 +38,9 @@ class Layer {
    * layer.
    */
   explicit Layer(const LayerParameter& param)
-    : layer_param_(param) {
+    : infer_type_(eNative)
+    , layer_param_(param)
+     {
       // Set phase and copy blobs (if there are any).
       phase_ = param.phase();
       if (layer_param_.blobs_size() > 0) {
@@ -291,8 +293,20 @@ class Layer {
     param_propagate_down_[param_id] = value;
   }
 
+  // Preserve orignal infer type. eg, split layer does not support int8.
+  // Hence, override in special layer
+  virtual inline void set_infer_type(QuantInferType type) {
+    infer_type_ = type;
+  }
+
+  inline QuantInferType infer_type() const {
+    return infer_type_;
+  }
 
  protected:
+  /** Quantize Inference type of this layer*/
+  QuantInferType infer_type_;
+
   /** The protobuf that stores the layer parameters */
   LayerParameter layer_param_;
   /** The phase: TRAIN or TEST */

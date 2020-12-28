@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "caffe/quantization.hpp"
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/syncedmem.hpp"
@@ -24,7 +25,7 @@ template <typename Dtype>
 class Blob {
  public:
   Blob()
-       : data_(), diff_(), count_(0), capacity_(0) {}
+       : data_(), diff_(), count_(0), capacity_(0), quant_type_(eFp32) {}
 
   /// @brief Deprecated; use <code>Blob(const vector<int>& shape)</code>.
   explicit Blob(const int num, const int channels, const int height,
@@ -267,6 +268,10 @@ class Blob {
   bool ShapeEquals(const BlobProto& other);
   void SetQuantizationRange(Dtype max, Dtype min);
   void SetQuantizationRange(const vector<Dtype>& max, const vector<Dtype>& min);
+  void SetQuantType(QuantType type);
+  inline QuantType QuantType() const {
+    return quant_type_;
+  }
 
  protected:
   shared_ptr<SyncedMemory> data_;
@@ -278,6 +283,7 @@ class Blob {
 
   vector<Dtype> max_;
   vector<Dtype> min_;
+  QuantType quant_type_;
 
   DISABLE_COPY_AND_ASSIGN(Blob);
 };  // class Blob

@@ -63,14 +63,16 @@ template <typename Dtype>
 Blob<Dtype>::Blob(const int num, const int channels, const int height,
     const int width)
   // capacity_ must be initialized before calling Reshape
-  : capacity_(0) {
+  : capacity_(0)
+  , quant_type_(eFp32) {
   Reshape(num, channels, height, width);
 }
 
 template <typename Dtype>
 Blob<Dtype>::Blob(const vector<int>& shape)
   // capacity_ must be initialized before calling Reshape
-  : capacity_(0) {
+  : capacity_(0)
+  , quant_type_(eFp32) {
   Reshape(shape);
 }
 
@@ -567,6 +569,11 @@ void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& max, const vector<Dt
 
   max_ = max;
   min_ = min;
+}
+
+template <typename Dtype>
+void Blob<Dtype>::SetQuantType(QuantType type) {
+  quant_type_ = type;
 }
 
 INSTANTIATE_CLASS(Blob);
