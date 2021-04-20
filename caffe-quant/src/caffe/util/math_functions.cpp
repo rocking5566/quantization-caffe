@@ -382,4 +382,41 @@ void caffe_cpu_scale<double>(const int n, const double alpha, const double *x,
   cblas_dscal(n, alpha, y, 1);
 }
 
+template <typename Dtype>
+void fixpoint_quantize_cpu(Dtype* data, int data_count, Dtype threshold, QuantType dtype) {
+  double inv_scale = 0;
+  int upper = INT_MAX;
+  int lower = INT_MIN;
+
+  if (dtype == eInt16) {
+    upper = 32767;
+    lower = -32768;
+  }
+  else if (dtype == eInt8) {
+    upper = 127;
+    lower = -128;
+  }
+  else if (dtype == eInt4) {
+    upper = 7;
+    lower = -8;
+  }
+  else
+    LOG(FATAL) << "Doesn't support " << dtype << " for quantization";
+
+  inv_scale = upper / threshold;
+
+  for (int i = 0; i < data_count; ++i) {
+    data[i] = std::floor(data[i] * inv_scale + 0.5f);
+    data[i] = data[i] < upper ? data[i] : upper;
+    data[i] = data[i] > lower ? data[i] : lower;
+  }
+}
+
+template void fixpoint_quantize_cpu<>(int* data, int data_count, int threshold, QuantType dtype);
+template void fixpoint_quantize_cpu<>(unsigned int* data, int data_count, unsigned int threshold, QuantType dtype);
+template void fixpoint_quantize_cpu<>(float* data, int data_count, float threshold, QuantType dtype);
+template void fixpoint_quantize_cpu<>(double* data, int data_count, double threshold, QuantType dtype);
+template void fixpoint_quantize_cpu<>(bool* data, int data_count, bool threshold, QuantType dtype);
+
+
 }  // namespace caffe

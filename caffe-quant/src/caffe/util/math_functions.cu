@@ -456,4 +456,45 @@ void caffe_gpu_rng_gaussian(const int n, const double mu, const double sigma,
       curandGenerateNormalDouble(Caffe::curand_generator(), r, n, mu, sigma));
 }
 
+template <typename Dtype>
+__global__ void quantize_kernel(const int n, const Dtype *in, Dtype *out, const Dtype inv_scale, Dtype upper, Dtype lower) {
+  CUDA_KERNEL_LOOP(index, n){
+    out[index] = floor(in[index] * inv_scale + 0.5f);
+    out[index] = out[index] < upper ? out[index] : upper;
+    out[index] = out[index] > lower ? out[index] : lower;
+  }
+}
+
+template <typename Dtype>
+void fixpoint_quantize_gpu(Dtype* data, int data_count, Dtype threshold, QuantType dtype) {
+  double inv_scale = 0;
+  int upper = INT_MAX;
+  int lower = INT_MIN;
+
+  if (dtype == eInt16) {
+    upper = 32767;
+    lower = -32768;
+  }
+  else if (dtype == eInt8) {
+    upper = 127;
+    lower = -128;
+  }
+  else if (dtype == eInt4) {
+    upper = 7;
+    lower = -8;
+  }
+  else
+    LOG(FATAL) << "Doesn't support " << dtype << " for quantization";
+
+  inv_scale = upper / threshold;
+
+  quantize_kernel<Dtype><<<CAFFE_GET_BLOCKS(data_count), CAFFE_CUDA_NUM_THREADS>>>(
+      data_count, data, data, inv_scale, upper, lower);
+}
+template void fixpoint_quantize_gpu<>(int* data, int data_count, int threshold, QuantType dtype);
+template void fixpoint_quantize_gpu<>(unsigned int* data, int data_count, unsigned int threshold, QuantType dtype);
+template void fixpoint_quantize_gpu<>(float* data, int data_count, float threshold, QuantType dtype);
+template void fixpoint_quantize_gpu<>(double* data, int data_count, double threshold, QuantType dtype);
+template void fixpoint_quantize_gpu<>(bool* data, int data_count, bool threshold, QuantType dtype);
+
 }  // namespace caffe

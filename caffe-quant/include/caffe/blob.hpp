@@ -266,12 +266,16 @@ class Blob {
   void ShareDiff(const Blob& other);
 
   bool ShapeEquals(const BlobProto& other);
+  void SetQuantizationRange(Dtype threshold);
+  void SetQuantizationRange(const vector<Dtype>& thresholds);
   void SetQuantizationRange(Dtype max, Dtype min);
   void SetQuantizationRange(const vector<Dtype>& max, const vector<Dtype>& min);
   void SetQuantType(QuantType type);
-  inline QuantType QuantType() const {
+  inline QuantType quant_type() const {
     return quant_type_;
   }
+
+  void Quantize();
 
  protected:
   shared_ptr<SyncedMemory> data_;

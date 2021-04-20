@@ -556,6 +556,21 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
 }
 
 template <typename Dtype>
+void Blob<Dtype>::SetQuantizationRange(Dtype threshold) {
+  max_ = { threshold };
+  min_ = { -threshold };
+}
+
+template <typename Dtype>
+void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& thresholds) {
+  max_ = thresholds;
+  min_.resize(thresholds.size());
+
+  for (int i = 0; i < thresholds.size(); ++i)
+    min_[i] = -thresholds[i];
+}
+
+template <typename Dtype>
 void Blob<Dtype>::SetQuantizationRange(Dtype max, Dtype min) {
   LOG_IF(FATAL, max != -min) << "only support symmetric quantization so far";
   max_ = { max };
@@ -574,6 +589,28 @@ void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& max, const vector<Dt
 template <typename Dtype>
 void Blob<Dtype>::SetQuantType(QuantType type) {
   quant_type_ = type;
+}
+
+template <typename Dtype>
+void Blob<Dtype>::Quantize() {
+  switch (Caffe::mode()) {
+  case Caffe::CPU:
+    if (max_.size() == 1) {
+      fixpoint_quantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
+
+    } else {
+      LOG(FATAL) << "Doesn't support perchannel quantization";
+    }
+    break;
+  case Caffe::GPU:
+    if (max_.size() == 1) {
+      fixpoint_quantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
+
+    } else {
+      LOG(FATAL) << "Doesn't support perchannel quantization";
+    }
+    break;
+  }
 }
 
 INSTANTIATE_CLASS(Blob);
