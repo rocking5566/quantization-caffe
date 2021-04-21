@@ -66,7 +66,28 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
 
   virtual inline const char* type() const { return "Convolution"; }
 
- protected:
+  virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {
+    thresholds.clear();
+    Dtype* weight = this->blobs_[0]->mutable_cpu_data();
+    if (!bPerchannel) {
+      Dtype thr = INT_MIN;
+      for (int i = 0; i < this->blobs_[0]->count(); ++i)
+        thr = std::max(thr, weight[i]);
+
+      thresholds.push_back(thr);
+    } else {
+      for (int i = 0; i < this->blobs_[0]->shape(0); ++i) {
+        Dtype thr = INT_MIN;
+        int ihw_size = this->blobs_[0]->shape(1) * this->blobs_[0]->shape(2) * this->blobs_[0]->shape(3);
+        Dtype* sub_weight = weight + i * ihw_size;
+
+        for (int i = 0; i < ihw_size; ++i)
+          thr = std::max(thr, std::abs(sub_weight[i]));
+
+        thresholds.push_back(thr);
+      }
+    }
+  } protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,

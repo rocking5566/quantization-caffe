@@ -303,6 +303,9 @@ class Layer {
     return infer_type_;
   }
 
+  virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {
+    LOG(INFO) << type() << " does not support weight quantization";
+  };
  protected:
   /** Quantize Inference type of this layer*/
   QuantInferType infer_type_;
