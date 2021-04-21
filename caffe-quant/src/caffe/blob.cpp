@@ -597,17 +597,29 @@ void Blob<Dtype>::FakeQuantize() {
   case Caffe::CPU:
     if (max_.size() == 1) {
       fixpoint_fake_quantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
-
     } else {
-      LOG(FATAL) << "Doesn't support perchannel quantization";
+      if (count() % max_.size() != 0)
+        LOG(FATAL) << "blob.count() %% threshold_size != 0";
+
+      int channel_size = count() / max_.size();
+      for (int i = 0; i < max_.size(); ++i) {
+        Dtype* data = mutable_cpu_data() + i * channel_size;
+        fixpoint_fake_quantize_cpu(data, channel_size, max_[i], quant_type_);
+      }
     }
     break;
   case Caffe::GPU:
     if (max_.size() == 1) {
       fixpoint_fake_quantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
-
     } else {
-      LOG(FATAL) << "Doesn't support perchannel quantization";
+      if (count() % max_.size() != 0)
+        LOG(FATAL) << "blob.count() %% threshold_size != 0";
+
+      int channel_size = count() / max_.size();
+      for (int i = 0; i < max_.size(); ++i) {
+        Dtype* data = mutable_gpu_data() + i * channel_size;
+        fixpoint_fake_quantize_gpu(data, channel_size, max_[i], quant_type_);
+      }
     }
     break;
   }
@@ -619,17 +631,29 @@ void Blob<Dtype>::Quantize() {
   case Caffe::CPU:
     if (max_.size() == 1) {
       fixpoint_quantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
-
     } else {
-      LOG(FATAL) << "Doesn't support perchannel quantization";
+      if (count() % max_.size() != 0)
+        LOG(FATAL) << "blob.count() %% threshold_size != 0";
+
+      int channel_size = count() / max_.size();
+      for (int i = 0; i < max_.size(); ++i) {
+        Dtype* data = mutable_cpu_data() + i * channel_size;
+        fixpoint_quantize_cpu(data, channel_size, max_[i], quant_type_);
+      }
     }
     break;
   case Caffe::GPU:
     if (max_.size() == 1) {
       fixpoint_quantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
-
     } else {
-      LOG(FATAL) << "Doesn't support perchannel quantization";
+      if (count() % max_.size() != 0)
+        LOG(FATAL) << "blob.count() %% threshold_size != 0";
+
+      int channel_size = count() / max_.size();
+      for (int i = 0; i < max_.size(); ++i) {
+        Dtype* data = mutable_gpu_data() + i * channel_size;
+        fixpoint_quantize_gpu(data, channel_size, max_[i], quant_type_);
+      }
     }
     break;
   }
@@ -641,17 +665,29 @@ void Blob<Dtype>::Dequantize() {
   case Caffe::CPU:
     if (max_.size() == 1) {
       fixpoint_dequantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
-
     } else {
-      LOG(FATAL) << "Doesn't support perchannel quantization";
+      if (count() % max_.size() != 0)
+        LOG(FATAL) << "blob.count() %% threshold_size != 0";
+
+      int channel_size = count() / max_.size();
+      for (int i = 0; i < max_.size(); ++i) {
+        Dtype* data = mutable_cpu_data() + i * channel_size;
+        fixpoint_dequantize_cpu(data, channel_size, max_[i], quant_type_);
+      }
     }
     break;
   case Caffe::GPU:
     if (max_.size() == 1) {
       fixpoint_dequantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
-
     } else {
-      LOG(FATAL) << "Doesn't support perchannel quantization";
+      if (count() % max_.size() != 0)
+        LOG(FATAL) << "blob.count() %% threshold_size != 0";
+
+      int channel_size = count() / max_.size();
+      for (int i = 0; i < max_.size(); ++i) {
+        Dtype* data = mutable_gpu_data() + i * channel_size;
+        fixpoint_dequantize_gpu(data, channel_size, max_[i], quant_type_);
+      }
     }
     break;
   }
