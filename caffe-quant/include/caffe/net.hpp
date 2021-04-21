@@ -30,6 +30,7 @@ class Net {
 
   // Quantization related funtion
   void ImportActivationRange(const string& threshold_table_path);
+  void InitFakeQuantInt8(bool bPerchannel=true);
 
   /// @brief Initialize a network with a NetParameter.
   void Init(const NetParameter& param);

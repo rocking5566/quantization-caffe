@@ -22,6 +22,8 @@
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/upgrade_proto.hpp"
 
+#include "caffe/layers/conv_layer.hpp"
+
 namespace caffe {
 
 template <typename Dtype>
@@ -69,6 +71,24 @@ void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
       } else {
         LOG(FATAL) << line << std::endl << "not match required format";
       }
+  }
+}
+
+template <typename Dtype>
+void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+    Layer<Dtype>* layer = layers_[layer_id].get();
+
+    vector<Dtype> weightRange;
+    layer->CalSymmetricWeightRange(weightRange, bPerchannel);
+    layer->FakeQuantWeight(weightRange, eInt8);
+
+    vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
+    for (int i = 0; i < top_blobs.size(); ++i) {
+      top_blobs[i]->SetQuantType(eInt8);
+    }
+
+    layer->set_infer_type(eFakeQuant);
   }
 }
 
