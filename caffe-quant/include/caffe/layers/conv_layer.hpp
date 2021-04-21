@@ -72,7 +72,7 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
     if (!bPerchannel) {
       Dtype thr = INT_MIN;
       for (int i = 0; i < this->blobs_[0]->count(); ++i)
-        thr = std::max(thr, weight[i]);
+        thr = std::max(thr, std::abs(weight[i]));
 
       thresholds.push_back(thr);
     } else {
