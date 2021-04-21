@@ -276,6 +276,7 @@ class Blob {
   }
 
   void Quantize();
+  void Dequantize();
 
  protected:
   shared_ptr<SyncedMemory> data_;

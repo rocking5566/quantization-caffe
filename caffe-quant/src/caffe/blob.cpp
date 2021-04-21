@@ -613,6 +613,28 @@ void Blob<Dtype>::Quantize() {
   }
 }
 
+template <typename Dtype>
+void Blob<Dtype>::Dequantize() {
+  switch (Caffe::mode()) {
+  case Caffe::CPU:
+    if (max_.size() == 1) {
+      fixpoint_dequantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
+
+    } else {
+      LOG(FATAL) << "Doesn't support perchannel quantization";
+    }
+    break;
+  case Caffe::GPU:
+    if (max_.size() == 1) {
+      fixpoint_dequantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
+
+    } else {
+      LOG(FATAL) << "Doesn't support perchannel quantization";
+    }
+    break;
+  }
+}
+
 INSTANTIATE_CLASS(Blob);
 template class Blob<int>;
 template class Blob<unsigned int>;
