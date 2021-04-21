@@ -275,6 +275,7 @@ class Blob {
     return quant_type_;
   }
 
+  void FakeQuantize();
   void Quantize();
   void Dequantize();
 

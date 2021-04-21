@@ -592,6 +592,28 @@ void Blob<Dtype>::SetQuantType(QuantType type) {
 }
 
 template <typename Dtype>
+void Blob<Dtype>::FakeQuantize() {
+  switch (Caffe::mode()) {
+  case Caffe::CPU:
+    if (max_.size() == 1) {
+      fixpoint_fake_quantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
+
+    } else {
+      LOG(FATAL) << "Doesn't support perchannel quantization";
+    }
+    break;
+  case Caffe::GPU:
+    if (max_.size() == 1) {
+      fixpoint_fake_quantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
+
+    } else {
+      LOG(FATAL) << "Doesn't support perchannel quantization";
+    }
+    break;
+  }
+}
+
+template <typename Dtype>
 void Blob<Dtype>::Quantize() {
   switch (Caffe::mode()) {
   case Caffe::CPU:

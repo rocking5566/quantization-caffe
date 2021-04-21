@@ -529,5 +529,47 @@ template void fixpoint_dequantize_gpu<>(float* data, int data_count, float thres
 template void fixpoint_dequantize_gpu<>(double* data, int data_count, double threshold, QuantType dtype);
 template void fixpoint_dequantize_gpu<>(bool* data, int data_count, bool threshold, QuantType dtype);
 
+template <typename Dtype>
+__global__ void fake_quantize_kernel(const int n, const Dtype *in, Dtype *out, const Dtype scale, Dtype upper, Dtype lower) {
+  Dtype inv_scale = 1.0f / scale;
+  CUDA_KERNEL_LOOP(index, n){
+    out[index] = floor(in[index] * inv_scale + 0.5f);
+    out[index] = out[index] < upper ? out[index] : upper;
+    out[index] = out[index] > lower ? out[index] : lower;
+    out[index] = scale * out[index];
+  }
+}
+
+template <typename Dtype>
+void fixpoint_fake_quantize_gpu(Dtype* data, int data_count, Dtype threshold, QuantType dtype) {
+  double scale = 0;
+  int upper = INT_MAX;
+  int lower = INT_MIN;
+
+  if (dtype == eInt16) {
+    upper = 32767;
+    lower = -32768;
+  }
+  else if (dtype == eInt8) {
+    upper = 127;
+    lower = -128;
+  }
+  else if (dtype == eInt4) {
+    upper = 7;
+    lower = -8;
+  }
+  else
+    LOG(FATAL) << "Doesn't support " << dtype << " for quantization";
+
+  scale = threshold / upper;
+
+  fake_quantize_kernel<Dtype><<<CAFFE_GET_BLOCKS(data_count), CAFFE_CUDA_NUM_THREADS>>>(
+      data_count, data, data, scale, upper, lower);
+}
+template void fixpoint_fake_quantize_gpu<>(int* data, int data_count, int threshold, QuantType dtype);
+template void fixpoint_fake_quantize_gpu<>(unsigned int* data, int data_count, unsigned int threshold, QuantType dtype);
+template void fixpoint_fake_quantize_gpu<>(float* data, int data_count, float threshold, QuantType dtype);
+template void fixpoint_fake_quantize_gpu<>(double* data, int data_count, double threshold, QuantType dtype);
+template void fixpoint_fake_quantize_gpu<>(bool* data, int data_count, bool threshold, QuantType dtype);
 
 }  // namespace caffe
