@@ -340,9 +340,6 @@ class Net {
   vector<Callback*> before_backward_;
   vector<Callback*> after_backward_;
 
-  /// Quantization
-  map<string, float> range_map;
-
 DISABLE_COPY_AND_ASSIGN(Net);
 };
 
