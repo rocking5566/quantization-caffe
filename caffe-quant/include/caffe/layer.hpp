@@ -429,6 +429,13 @@ class Layer {
 template <typename Dtype>
 inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+  // FIXME - No need to further pre-fakequant for every blob
+  // Only layer quant type change need to pre-fakequant
+  // eg. fp32 -> int8
+  if (this->infer_type() == eFakeQuant) {
+    for (auto top_blob : top)
+      top_blob->FakeQuantize();
+  }
   Dtype loss = 0;
   Reshape(bottom, top);
   switch (Caffe::mode()) {
@@ -458,6 +465,11 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
     break;
   default:
     LOG(FATAL) << "Unknown caffe mode.";
+  }
+
+  if (this->infer_type() == eFakeQuant) {
+    for (auto top_blob : top)
+      top_blob->FakeQuantize();
   }
   return loss;
 }
