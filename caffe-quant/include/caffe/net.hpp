@@ -3,6 +3,7 @@
 
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -339,6 +340,8 @@ class Net {
   vector<Callback*> after_forward_;
   vector<Callback*> before_backward_;
   vector<Callback*> after_backward_;
+  // Need to add std ahead of the unordered_set. Or you may suffer from compile error...
+  std::unordered_set<string> no_need_to_quant_;
 
 DISABLE_COPY_AND_ASSIGN(Net);
 };

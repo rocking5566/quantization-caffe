@@ -79,22 +79,28 @@ template <typename Dtype>
 void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
   for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
     Layer<Dtype>* layer = layers_[layer_id].get();
-
+    string layer_type = layer->type();
     vector<Dtype> weightRange;
+
     layer->CalSymmetricWeightRange(weightRange, bPerchannel);
     layer->FakeQuantWeight(weightRange, eInt8);
+    // TODO - fake quantization for bias
 
     vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
     for (int i = 0; i < top_blobs.size(); ++i) {
       top_blobs[i]->SetQuantType(eInt8);
     }
-
-    layer->set_infer_type(eFakeQuant);
+    if (no_need_to_quant_.count(layer_type) == 0)
+      layer->set_infer_type(eFakeQuant);
   }
 }
 
 template <typename Dtype>
 void Net<Dtype>::Init(const NetParameter& in_param) {
+  no_need_to_quant_.insert("Reshape");
+  no_need_to_quant_.insert("Flatten");
+  no_need_to_quant_.insert("Softmax");
+  no_need_to_quant_.insert("Python");
   // Set phase from the state.
   phase_ = in_param.state().phase();
   // Filter layers based on their include/exclude rules and
