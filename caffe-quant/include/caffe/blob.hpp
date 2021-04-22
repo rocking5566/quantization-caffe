@@ -286,9 +286,8 @@ class Blob {
   vector<int> shape_;
   int count_;
   int capacity_;
-
-  vector<Dtype> max_;
-  vector<Dtype> min_;
+  vector<Dtype> qmax_;
+  vector<Dtype> qmin_;
   QuantType quant_type_;
 
   DISABLE_COPY_AND_ASSIGN(Blob);

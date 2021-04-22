@@ -557,24 +557,24 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
 
 template <typename Dtype>
 void Blob<Dtype>::SetQuantizationRange(Dtype threshold) {
-  max_ = { threshold };
-  min_ = { -threshold };
+  qmax_ = { threshold };
+  qmin_ = { -threshold };
 }
 
 template <typename Dtype>
 void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& thresholds) {
-  max_ = thresholds;
-  min_.resize(thresholds.size());
+  qmax_ = thresholds;
+  qmin_.resize(thresholds.size());
 
   for (int i = 0; i < thresholds.size(); ++i)
-    min_[i] = -thresholds[i];
+    qmin_[i] = -thresholds[i];
 }
 
 template <typename Dtype>
 void Blob<Dtype>::SetQuantizationRange(Dtype max, Dtype min) {
   LOG_IF(FATAL, max != -min) << "only support symmetric quantization so far";
-  max_ = { max };
-  min_ = { min };
+  qmax_ = { max };
+  qmin_ = { min };
 }
 
 template <typename Dtype>
@@ -582,8 +582,8 @@ void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& max, const vector<Dt
   for (int i = 0; i < max.size(); ++i)
     LOG_IF(FATAL, max[i] != -min[i]) << "only support symmetric quantization so far";
 
-  max_ = max;
-  min_ = min;
+  qmax_ = max;
+  qmin_ = min;
 }
 
 template <typename Dtype>
@@ -593,32 +593,34 @@ void Blob<Dtype>::SetQuantType(QuantType type) {
 
 template <typename Dtype>
 void Blob<Dtype>::FakeQuantize() {
+  if (qmax_.size() == 0)
+    LOG(FATAL) << "No quantization range, blob.count() = " << count();
   switch (Caffe::mode()) {
   case Caffe::CPU:
-    if (max_.size() == 1) {
-      fixpoint_fake_quantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
+    if (qmax_.size() == 1) {
+      fixpoint_fake_quantize_cpu(mutable_cpu_data(), count(), qmax_[0], quant_type_);
     } else {
-      if (count() % max_.size() != 0)
+      if (count() % qmax_.size() != 0)
         LOG(FATAL) << "blob.count() %% threshold_size != 0";
 
-      int channel_size = count() / max_.size();
-      for (int i = 0; i < max_.size(); ++i) {
+      int channel_size = count() / qmax_.size();
+      for (int i = 0; i < qmax_.size(); ++i) {
         Dtype* data = mutable_cpu_data() + i * channel_size;
-        fixpoint_fake_quantize_cpu(data, channel_size, max_[i], quant_type_);
+        fixpoint_fake_quantize_cpu(data, channel_size, qmax_[i], quant_type_);
       }
     }
     break;
   case Caffe::GPU:
-    if (max_.size() == 1) {
-      fixpoint_fake_quantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
+    if (qmax_.size() == 1) {
+      fixpoint_fake_quantize_gpu(mutable_gpu_data(), count(), qmax_[0], quant_type_);
     } else {
-      if (count() % max_.size() != 0)
+      if (count() % qmax_.size() != 0)
         LOG(FATAL) << "blob.count() %% threshold_size != 0";
 
-      int channel_size = count() / max_.size();
-      for (int i = 0; i < max_.size(); ++i) {
+      int channel_size = count() / qmax_.size();
+      for (int i = 0; i < qmax_.size(); ++i) {
         Dtype* data = mutable_gpu_data() + i * channel_size;
-        fixpoint_fake_quantize_gpu(data, channel_size, max_[i], quant_type_);
+        fixpoint_fake_quantize_gpu(data, channel_size, qmax_[i], quant_type_);
       }
     }
     break;
@@ -627,32 +629,34 @@ void Blob<Dtype>::FakeQuantize() {
 
 template <typename Dtype>
 void Blob<Dtype>::Quantize() {
+  if (qmax_.size() == 0)
+    LOG(FATAL) << "No quantization range, blob.count() = " << count();
   switch (Caffe::mode()) {
   case Caffe::CPU:
-    if (max_.size() == 1) {
-      fixpoint_quantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
+    if (qmax_.size() == 1) {
+      fixpoint_quantize_cpu(mutable_cpu_data(), count(), qmax_[0], quant_type_);
     } else {
-      if (count() % max_.size() != 0)
+      if (count() % qmax_.size() != 0)
         LOG(FATAL) << "blob.count() %% threshold_size != 0";
 
-      int channel_size = count() / max_.size();
-      for (int i = 0; i < max_.size(); ++i) {
+      int channel_size = count() / qmax_.size();
+      for (int i = 0; i < qmax_.size(); ++i) {
         Dtype* data = mutable_cpu_data() + i * channel_size;
-        fixpoint_quantize_cpu(data, channel_size, max_[i], quant_type_);
+        fixpoint_quantize_cpu(data, channel_size, qmax_[i], quant_type_);
       }
     }
     break;
   case Caffe::GPU:
-    if (max_.size() == 1) {
-      fixpoint_quantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
+    if (qmax_.size() == 1) {
+      fixpoint_quantize_gpu(mutable_gpu_data(), count(), qmax_[0], quant_type_);
     } else {
-      if (count() % max_.size() != 0)
+      if (count() % qmax_.size() != 0)
         LOG(FATAL) << "blob.count() %% threshold_size != 0";
 
-      int channel_size = count() / max_.size();
-      for (int i = 0; i < max_.size(); ++i) {
+      int channel_size = count() / qmax_.size();
+      for (int i = 0; i < qmax_.size(); ++i) {
         Dtype* data = mutable_gpu_data() + i * channel_size;
-        fixpoint_quantize_gpu(data, channel_size, max_[i], quant_type_);
+        fixpoint_quantize_gpu(data, channel_size, qmax_[i], quant_type_);
       }
     }
     break;
@@ -661,32 +665,34 @@ void Blob<Dtype>::Quantize() {
 
 template <typename Dtype>
 void Blob<Dtype>::Dequantize() {
+  if (qmax_.size() == 0)
+    LOG(FATAL) << "No quantization range, blob.count() = " << count();
   switch (Caffe::mode()) {
   case Caffe::CPU:
-    if (max_.size() == 1) {
-      fixpoint_dequantize_cpu(mutable_cpu_data(), count(), max_[0], quant_type_);
+    if (qmax_.size() == 1) {
+      fixpoint_dequantize_cpu(mutable_cpu_data(), count(), qmax_[0], quant_type_);
     } else {
-      if (count() % max_.size() != 0)
+      if (count() % qmax_.size() != 0)
         LOG(FATAL) << "blob.count() %% threshold_size != 0";
 
-      int channel_size = count() / max_.size();
-      for (int i = 0; i < max_.size(); ++i) {
+      int channel_size = count() / qmax_.size();
+      for (int i = 0; i < qmax_.size(); ++i) {
         Dtype* data = mutable_cpu_data() + i * channel_size;
-        fixpoint_dequantize_cpu(data, channel_size, max_[i], quant_type_);
+        fixpoint_dequantize_cpu(data, channel_size, qmax_[i], quant_type_);
       }
     }
     break;
   case Caffe::GPU:
-    if (max_.size() == 1) {
-      fixpoint_dequantize_gpu(mutable_gpu_data(), count(), max_[0], quant_type_);
+    if (qmax_.size() == 1) {
+      fixpoint_dequantize_gpu(mutable_gpu_data(), count(), qmax_[0], quant_type_);
     } else {
-      if (count() % max_.size() != 0)
+      if (count() % qmax_.size() != 0)
         LOG(FATAL) << "blob.count() %% threshold_size != 0";
 
-      int channel_size = count() / max_.size();
-      for (int i = 0; i < max_.size(); ++i) {
+      int channel_size = count() / qmax_.size();
+      for (int i = 0; i < qmax_.size(); ++i) {
         Dtype* data = mutable_gpu_data() + i * channel_size;
-        fixpoint_dequantize_gpu(data, channel_size, max_[i], quant_type_);
+        fixpoint_dequantize_gpu(data, channel_size, qmax_[i], quant_type_);
       }
     }
     break;
