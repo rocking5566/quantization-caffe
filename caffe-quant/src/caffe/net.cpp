@@ -62,8 +62,9 @@ void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
         shared_ptr<Layer<Dtype> > layer_ptr = layer_by_name(layer_name);
         if (layer_ptr != NULL) {
           int layer_id = layer_names_index_[layer_name];
-          for (int i = 0; i < bottom_vecs_[layer_id].size(); ++i) {
-            bottom_vecs_[layer_id][i]->SetQuantizationRange(threshold, -threshold);
+          vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
+          for (int i = 0; i < top_blobs.size(); ++i) {
+            top_blobs[i]->SetQuantizationRange(threshold);
           }
         }
       } else if (regex_match(line, asym_pattern)) {
