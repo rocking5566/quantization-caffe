@@ -293,9 +293,7 @@ class Layer {
     param_propagate_down_[param_id] = value;
   }
 
-  // Preserve orignal infer type. eg, split layer does not support int8.
-  // Hence, override in special layer
-  virtual inline void set_infer_type(QuantInferType type) {
+  inline void set_infer_type(QuantInferType type) {
     infer_type_ = type;
   }
 
