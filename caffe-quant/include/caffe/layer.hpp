@@ -304,7 +304,7 @@ class Layer {
   }
 
   virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {};
-  virtual void FakeQuantWeight(vector<Dtype>& thresholds, QuantType dtype) {};
+  virtual void FakeQuantWeight(vector<Dtype>& thresholds, BlobQuantType dtype) {};
 
  protected:
   /** Quantize Inference type of this layer*/

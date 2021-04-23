@@ -270,8 +270,8 @@ class Blob {
   void SetQuantizationRange(const vector<Dtype>& thresholds);
   void SetQuantizationRange(Dtype max, Dtype min);
   void SetQuantizationRange(const vector<Dtype>& max, const vector<Dtype>& min);
-  void SetQuantType(QuantType type);
-  inline QuantType quant_type() const {
+  void SetQuantType(BlobQuantType dtype);
+  inline BlobQuantType quant_type() const {
     return quant_type_;
   }
 
@@ -288,7 +288,7 @@ class Blob {
   int capacity_;
   vector<Dtype> qmax_;
   vector<Dtype> qmin_;
-  QuantType quant_type_;
+  BlobQuantType quant_type_;
 
   DISABLE_COPY_AND_ASSIGN(Blob);
 };  // class Blob

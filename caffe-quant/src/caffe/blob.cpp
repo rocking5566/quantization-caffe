@@ -587,8 +587,8 @@ void Blob<Dtype>::SetQuantizationRange(const vector<Dtype>& max, const vector<Dt
 }
 
 template <typename Dtype>
-void Blob<Dtype>::SetQuantType(QuantType type) {
-  quant_type_ = type;
+void Blob<Dtype>::SetQuantType(BlobQuantType dtype) {
+  quant_type_ = dtype;
 }
 
 template <typename Dtype>

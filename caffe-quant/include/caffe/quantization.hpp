@@ -12,7 +12,7 @@ namespace caffe {
     eFakeQuant
   };
 
-  enum QuantType {
+  enum BlobQuantType {
     eFp32,
     eBf16,
     eInt16,
