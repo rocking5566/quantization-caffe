@@ -82,8 +82,11 @@ void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
     string layer_type = layer->type();
     vector<Dtype> weightRange;
 
-    layer->CalSymmetricWeightRange(weightRange, bPerchannel);
-    layer->FakeQuantWeight(weightRange, eInt8);
+    if (support_quant_weight_.count(layer_type) == 1) {
+      layer->CalSymmetricWeightRange(weightRange, bPerchannel);
+      layer->set_weight_quant_param(weightRange, eInt8);
+      layer->FakeQuantWeight();
+    }
     // TODO - fake quantization for bias
 
     vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
@@ -101,6 +104,9 @@ void Net<Dtype>::Init(const NetParameter& in_param) {
   no_need_to_quant_.insert("Flatten");
   no_need_to_quant_.insert("Softmax");
   no_need_to_quant_.insert("Python");
+
+  support_quant_weight_.insert("Convolution");
+
   // Set phase from the state.
   phase_ = in_param.state().phase();
   // Filter layers based on their include/exclude rules and

@@ -301,8 +301,23 @@ class Layer {
     return infer_type_;
   }
 
+  inline void set_weight_quant_param(vector<Dtype>& thresholds, BlobQuantType qtype) {
+    if (this->blobs_.size() > 0) {
+      this->blobs_[0]->SetQuantType(qtype);
+      this->blobs_[0]->SetQuantizationRange(thresholds);
+    }
+    else
+      LOG(FATAL) << "This layer does not have weight";
+  }
+
+  inline void FakeQuantWeight() {
+    if (this->blobs_.size() > 0)
+      this->blobs_[0]->FakeQuantize();
+    else
+      LOG(FATAL) << "This layer does not have weight";
+  }
+
   virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {};
-  virtual void FakeQuantWeight(vector<Dtype>& thresholds, BlobQuantType dtype) {};
 
  protected:
   /** Quantize Inference type of this layer*/

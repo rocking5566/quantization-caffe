@@ -89,12 +89,6 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
     }
   }
 
-  virtual void FakeQuantWeight(vector<Dtype>& thresholds, BlobQuantType dtype) {
-    this->blobs_[0]->SetQuantType(dtype);
-    this->blobs_[0]->SetQuantizationRange(thresholds);
-    this->blobs_[0]->FakeQuantize();
-  }
-
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);

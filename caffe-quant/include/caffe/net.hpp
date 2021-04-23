@@ -342,6 +342,8 @@ class Net {
   vector<Callback*> after_backward_;
   // Need to add std ahead of the unordered_set. Or you may suffer from compile error...
   std::unordered_set<string> no_need_to_quant_;
+  std::unordered_set<string> support_quant_weight_;
+
 
 DISABLE_COPY_AND_ASSIGN(Net);
 };
