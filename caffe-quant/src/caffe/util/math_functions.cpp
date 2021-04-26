@@ -466,8 +466,8 @@ void fixpoint_fake_quantize_cpu(Dtype* data, int data_count, Dtype threshold, Bl
   else
     LOG(FATAL) << "Doesn't support " << dtype << " for quantization";
 
-  inv_scale = upper / threshold;
   scale = threshold / upper;
+  inv_scale = 1.0 / scale;
 
   for (int i = 0; i < data_count; ++i) {
     data[i] = std::floor(data[i] * inv_scale + 0.5f);
