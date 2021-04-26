@@ -82,6 +82,9 @@ void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
     string layer_type = layer->type();
     vector<Dtype> weightRange;
 
+    if (no_need_to_quant_.count(layer_type) == 1)
+      continue;
+
     if (support_quant_weight_.count(layer_type) == 1) {
       layer->CalSymmetricWeightRange(weightRange, bPerchannel);
       layer->set_weight_quant_param(weightRange, eInt8);
@@ -91,10 +94,10 @@ void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
 
     vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
     for (int i = 0; i < top_blobs.size(); ++i) {
-      top_blobs[i]->SetQuantType(eInt8);
+      layer->set_activation_quant_param(eInt8);
     }
-    if (no_need_to_quant_.count(layer_type) == 0)
-      layer->set_infer_type(eFakeQuant);
+
+    layer->set_infer_type(eFakeQuant);
   }
 }
 
