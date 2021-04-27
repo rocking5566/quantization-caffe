@@ -457,7 +457,7 @@ void caffe_gpu_rng_gaussian(const int n, const double mu, const double sigma,
 }
 
 template <typename Dtype>
-__global__ void quantize_kernel(const int n, const Dtype *in, Dtype *out, const Dtype inv_scale, Dtype upper, Dtype lower) {
+__global__ void quantize_kernel(const int n, const Dtype *in, Dtype *out, double inv_scale, int upper, int lower) {
   CUDA_KERNEL_LOOP(index, n){
     out[index] = floor(in[index] * inv_scale + 0.5f);
     out[index] = out[index] < upper ? out[index] : upper;
@@ -498,7 +498,7 @@ template void fixpoint_quantize_gpu<>(double* data, int data_count, double thres
 template void fixpoint_quantize_gpu<>(bool* data, int data_count, bool threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-__global__ void dequantize_kernel(const int n, const Dtype *in, Dtype *out, const Dtype scale) {
+__global__ void dequantize_kernel(const int n, const Dtype *in, Dtype *out, double scale) {
   CUDA_KERNEL_LOOP(index, n){
     out[index] = scale * in[index];
   }
@@ -530,8 +530,8 @@ template void fixpoint_dequantize_gpu<>(double* data, int data_count, double thr
 template void fixpoint_dequantize_gpu<>(bool* data, int data_count, bool threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-__global__ void fake_quantize_kernel(const int n, const Dtype *in, Dtype *out, const Dtype scale, Dtype upper, Dtype lower) {
-  Dtype inv_scale = 1.0f / scale;
+__global__ void fake_quantize_kernel(const int n, const Dtype *in, Dtype *out, double scale, int upper, int lower) {
+  double inv_scale = 1.0f / scale;
   CUDA_KERNEL_LOOP(index, n){
     out[index] = floor(in[index] * inv_scale + 0.5f);
     out[index] = out[index] < upper ? out[index] : upper;
