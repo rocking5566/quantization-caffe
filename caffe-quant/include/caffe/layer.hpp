@@ -39,6 +39,7 @@ class Layer {
    */
   explicit Layer(const LayerParameter& param)
     : infer_type_(eNative)
+    , activation_qtype_(eFp32)
     , layer_param_(param)
      {
       // Set phase and copy blobs (if there are any).
@@ -317,11 +318,16 @@ class Layer {
       LOG(FATAL) << "This layer does not have weight";
   }
 
+  inline void set_activation_quant_param(BlobQuantType qtype) {
+    activation_qtype_ = qtype;
+  }
+
   virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {};
 
  protected:
   /** Quantize Inference type of this layer*/
   QuantInferType infer_type_;
+  BlobQuantType activation_qtype_;
 
   /** The protobuf that stores the layer parameters */
   LayerParameter layer_param_;
@@ -446,8 +452,10 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
   // Only layer quant type change need to pre-fakequant
   // eg. fp32 -> int8
   if (this->infer_type() == eFakeQuant) {
-    for (auto top_blob : top)
-      top_blob->FakeQuantize();
+    for (auto bottom_blob : bottom) {
+      bottom_blob->SetQuantType(activation_qtype_);
+      bottom_blob->FakeQuantize();
+    }
   }
   Dtype loss = 0;
   Reshape(bottom, top);
@@ -481,8 +489,10 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
   }
 
   if (this->infer_type() == eFakeQuant) {
-    for (auto top_blob : top)
+    for (auto top_blob : top) {
+      top_blob->SetQuantType(activation_qtype_);
       top_blob->FakeQuantize();
+    }
   }
   return loss;
 }
