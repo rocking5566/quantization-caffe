@@ -383,7 +383,7 @@ void caffe_cpu_scale<double>(const int n, const double alpha, const double *x,
 }
 
 template <typename Dtype>
-void fixpoint_quantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype) {
+void fixpoint_quantize_cpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype) {
   double inv_scale = 0;
   int upper = INT_MAX;
   int lower = INT_MIN;
@@ -412,14 +412,14 @@ void fixpoint_quantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQua
   }
 }
 
-template void fixpoint_quantize_cpu<>(int* data, int data_count, int threshold, BlobQuantType dtype);
-template void fixpoint_quantize_cpu<>(unsigned int* data, int data_count, unsigned int threshold, BlobQuantType dtype);
-template void fixpoint_quantize_cpu<>(float* data, int data_count, float threshold, BlobQuantType dtype);
+template void fixpoint_quantize_cpu<>(int* data, int data_count, double threshold, BlobQuantType dtype);
+template void fixpoint_quantize_cpu<>(unsigned int* data, int data_count, double threshold, BlobQuantType dtype);
+template void fixpoint_quantize_cpu<>(float* data, int data_count, double threshold, BlobQuantType dtype);
 template void fixpoint_quantize_cpu<>(double* data, int data_count, double threshold, BlobQuantType dtype);
-template void fixpoint_quantize_cpu<>(bool* data, int data_count, bool threshold, BlobQuantType dtype);
+template void fixpoint_quantize_cpu<>(bool* data, int data_count, double threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-void fixpoint_dequantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype) {
+void fixpoint_dequantize_cpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype) {
   double scale = 0;
 
   if (dtype == eInt16) {
@@ -438,14 +438,14 @@ void fixpoint_dequantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQ
     data[i] = scale * data[i];
 }
 
-template void fixpoint_dequantize_cpu<>(int* data, int data_count, int threshold, BlobQuantType dtype);
-template void fixpoint_dequantize_cpu<>(unsigned int* data, int data_count, unsigned int threshold, BlobQuantType dtype);
-template void fixpoint_dequantize_cpu<>(float* data, int data_count, float threshold, BlobQuantType dtype);
+template void fixpoint_dequantize_cpu<>(int* data, int data_count, double threshold, BlobQuantType dtype);
+template void fixpoint_dequantize_cpu<>(unsigned int* data, int data_count, double threshold, BlobQuantType dtype);
+template void fixpoint_dequantize_cpu<>(float* data, int data_count, double threshold, BlobQuantType dtype);
 template void fixpoint_dequantize_cpu<>(double* data, int data_count, double threshold, BlobQuantType dtype);
-template void fixpoint_dequantize_cpu<>(bool* data, int data_count, bool threshold, BlobQuantType dtype);
+template void fixpoint_dequantize_cpu<>(bool* data, int data_count, double threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-void fixpoint_fake_quantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype) {
+void fixpoint_fake_quantize_cpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype) {
   double inv_scale = 0;
   double scale = 0;
   int upper = INT_MAX;
@@ -477,10 +477,10 @@ void fixpoint_fake_quantize_cpu(Dtype* data, int data_count, Dtype threshold, Bl
   }
 }
 
-template void fixpoint_fake_quantize_cpu<>(int* data, int data_count, int threshold, BlobQuantType dtype);
-template void fixpoint_fake_quantize_cpu<>(unsigned int* data, int data_count, unsigned int threshold, BlobQuantType dtype);
-template void fixpoint_fake_quantize_cpu<>(float* data, int data_count, float threshold, BlobQuantType dtype);
+template void fixpoint_fake_quantize_cpu<>(int* data, int data_count, double threshold, BlobQuantType dtype);
+template void fixpoint_fake_quantize_cpu<>(unsigned int* data, int data_count, double threshold, BlobQuantType dtype);
+template void fixpoint_fake_quantize_cpu<>(float* data, int data_count, double threshold, BlobQuantType dtype);
 template void fixpoint_fake_quantize_cpu<>(double* data, int data_count, double threshold, BlobQuantType dtype);
-template void fixpoint_fake_quantize_cpu<>(bool* data, int data_count, bool threshold, BlobQuantType dtype);
+template void fixpoint_fake_quantize_cpu<>(bool* data, int data_count, double threshold, BlobQuantType dtype);
 
 }  // namespace caffe

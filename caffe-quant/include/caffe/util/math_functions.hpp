@@ -147,23 +147,23 @@ template <typename Dtype>
 void caffe_cpu_scale(const int n, const Dtype alpha, const Dtype *x, Dtype* y);
 
 template <typename Dtype>
-void fixpoint_quantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype);
+void fixpoint_quantize_cpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-void fixpoint_dequantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype);
+void fixpoint_dequantize_cpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-void fixpoint_fake_quantize_cpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype);
+void fixpoint_fake_quantize_cpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype);
 
 #ifndef CPU_ONLY  // GPU]
 template <typename Dtype>
-void fixpoint_quantize_gpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype);
+void fixpoint_quantize_gpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-void fixpoint_dequantize_gpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype);
+void fixpoint_dequantize_gpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype);
 
 template <typename Dtype>
-void fixpoint_fake_quantize_gpu(Dtype* data, int data_count, Dtype threshold, BlobQuantType dtype);
+void fixpoint_fake_quantize_gpu(Dtype* data, int data_count, double threshold, BlobQuantType dtype);
 
 // Decaf gpu gemm provides an interface that is almost the same as the cpu
 // gemm function - following the c convention and calling the fortran-order
