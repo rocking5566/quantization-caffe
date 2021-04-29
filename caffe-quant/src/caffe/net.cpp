@@ -91,12 +91,7 @@ void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
       layer->FakeQuantWeight();
     }
     // TODO - fake quantization for bias
-
-    vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
-    for (int i = 0; i < top_blobs.size(); ++i) {
-      layer->set_activation_quant_param(eInt8);
-    }
-
+    layer->set_activation_quant_param(eInt8);
     layer->set_infer_type(eFakeQuant);
   }
 }
