@@ -411,6 +411,7 @@ BOOST_PYTHON_MODULE(_caffe) {
             bp::arg("weights")=bp::object())))
     // Legacy constructor
     .def("__init__", bp::make_constructor(&Net_Init_Load))
+    .def("PrintQuantInfo", &Net<Dtype>::PrintQuantInfo)
     .def("import_activation_range", &Net<Dtype>::ImportActivationRange)
     .def("init_fakequant_int8", &Net<Dtype>::InitFakeQuantInt8)
     .def("_forward", &Net<Dtype>::ForwardFromTo)

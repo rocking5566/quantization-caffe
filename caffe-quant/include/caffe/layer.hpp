@@ -311,6 +311,17 @@ class Layer {
       LOG(FATAL) << "This layer does not have weight";
   }
 
+  inline BlobQuantType weight_quant_param() {
+    if (this->blobs_.size() > 0) {
+      return this->blobs_[0]->quant_type();
+    }
+    else {
+      LOG(FATAL) << "This layer does not have weight";
+      return eFp32; // Prevent compile error
+    }
+
+  }
+
   inline void FakeQuantWeight() {
     if (this->blobs_.size() > 0)
       this->blobs_[0]->FakeQuantize();
@@ -320,6 +331,10 @@ class Layer {
 
   inline void set_activation_quant_param(BlobQuantType qtype) {
     activation_qtype_ = qtype;
+  }
+
+  inline BlobQuantType activation_quant_param() {
+    return activation_qtype_;
   }
 
   virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {};

@@ -102,6 +102,40 @@ void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
 }
 
 template <typename Dtype>
+void Net<Dtype>::PrintQuantInfo() {
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+    Layer<Dtype>* layer = layers_[layer_id].get();
+    string layer_type = layer->type();
+    bool bSupportQuant = no_need_to_quant_.count(layer_type) == 0;
+    bool bSupportQuantWeight = support_quant_weight_.count(layer_type) == 1;
+    vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
+
+    if (bSupportQuant) {
+      const char* activation_bit = BlobQuantTypeToString(layer->activation_quant_param());
+
+      if (bSupportQuantWeight) {
+        const char* weight_bit = BlobQuantTypeToString(layer->weight_quant_param());
+        LOG(INFO) << layer_names_[layer_id]
+          << " (" << layer_type << ")"
+          << ",\tsupport quant = " << bSupportQuant
+          << ", w = " << weight_bit
+          << ", activation = " << activation_bit;
+      } else {
+        LOG(INFO) << layer_names_[layer_id]
+          << " (" << layer_type << ")"
+          << ",\tsupport quant = " << bSupportQuant
+          << ", activation = " << activation_bit;
+      }
+
+    } else {
+      LOG(INFO) << layer_names_[layer_id]
+        << " (" << layer_type << ")"
+        << ",\tsupport quant = " << bSupportQuant;
+    }
+  }
+}
+
+template <typename Dtype>
 void Net<Dtype>::Init(const NetParameter& in_param) {
   no_need_to_quant_.insert("Reshape");
   no_need_to_quant_.insert("Flatten");
