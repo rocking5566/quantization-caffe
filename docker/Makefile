@@ -1,7 +1,7 @@
 DATA?="${HOME}/Data"
 DOCKER_FILE=Dockerfile
 DOCKER=nvidia-docker
-DOCKER_REPOSITORY=toolchain/bmcompress
+DOCKER_REPOSITORY=quantization/caffe
 IMAGE_NAME=${DOCKER_REPOSITORY}:dev_gpu
 REPO_ROOT?=$(shell git rev-parse --show-toplevel)
 
