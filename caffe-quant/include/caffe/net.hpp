@@ -31,7 +31,8 @@ class Net {
 
   // Quantization related funtion
   void ImportActivationRange(const string& threshold_table_path);
-  void InitFakeQuantInt8(bool bPerchannel=true);
+  void InitAllFakeQuantInt8(bool bPerchannel=true);
+  void InitFakeQuantInt8(const string& int8_layer_name, bool bPerchannel=true);
   void PrintQuantInfo();
   void ExportQuantInfo(const string &quant_info_file);
 

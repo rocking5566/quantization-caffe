@@ -76,7 +76,7 @@ void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
 }
 
 template <typename Dtype>
-void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
+void Net<Dtype>::InitAllFakeQuantInt8(bool bPerchannel) {
   for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
     Layer<Dtype>* layer = layers_[layer_id].get();
     string layer_type = layer->type();
@@ -94,6 +94,25 @@ void Net<Dtype>::InitFakeQuantInt8(bool bPerchannel) {
     layer->set_activation_quant_param(eInt8);
     layer->set_infer_type(eFakeQuant);
   }
+}
+
+template <typename Dtype>
+void Net<Dtype>::InitFakeQuantInt8(const string& int8_layer_name, bool bPerchannel) {
+  shared_ptr<Layer<Dtype> > layer = layer_by_name(int8_layer_name);
+  string layer_type = layer->type();
+  vector<Dtype> weightRange;
+
+  if (no_need_to_quant_.count(layer_type) == 1)
+    return;
+
+  if (support_quant_weight_.count(layer_type) == 1) {
+    layer->CalSymmetricWeightRange(weightRange, bPerchannel);
+    layer->set_weight_quant_param(weightRange, eInt8);
+    layer->FakeQuantWeight();
+  }
+  // TODO - fake quantization for bias
+  layer->set_activation_quant_param(eInt8);
+  layer->set_infer_type(eFakeQuant);
 }
 
 template <typename Dtype>
