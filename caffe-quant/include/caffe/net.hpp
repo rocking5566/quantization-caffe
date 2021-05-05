@@ -33,6 +33,7 @@ class Net {
   void ImportActivationRange(const string& threshold_table_path);
   void InitAllFakeQuantInt8(bool bPerchannel=true);
   void InitFakeQuantInt8(const string& int8_layer_name, bool bPerchannel=true);
+  bool IsSupportQuant(const string& layer_name);
   void PrintQuantInfo();
   void ExportQuantInfo(const string &quant_info_file);
 

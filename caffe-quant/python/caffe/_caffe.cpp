@@ -416,6 +416,7 @@ BOOST_PYTHON_MODULE(_caffe) {
     .def("import_activation_range", &Net<Dtype>::ImportActivationRange)
     .def("init_all_fakequant_int8", &Net<Dtype>::InitAllFakeQuantInt8)
     .def("init_fakequant_int8", &Net<Dtype>::InitFakeQuantInt8)
+    .def("is_support_quant", &Net<Dtype>::IsSupportQuant)
     .def("_forward", &Net<Dtype>::ForwardFromTo)
     .def("_backward", &Net<Dtype>::BackwardFromTo)
     .def("reshape", &Net<Dtype>::Reshape)
