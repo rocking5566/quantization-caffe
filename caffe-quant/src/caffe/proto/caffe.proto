@@ -421,6 +421,12 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
+  optional UpsampleParameter upsample_param = 152;
+}
+
+// message for upsample parameter
+message UpsampleParameter {
+  optional int32 scale = 1 [default = 1];
 }
 
 // Message that stores parameters used to apply transformation
