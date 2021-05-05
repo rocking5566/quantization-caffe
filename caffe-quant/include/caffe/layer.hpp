@@ -41,7 +41,7 @@ class Layer {
     : infer_type_(eNative)
     , activation_qtype_(eFp32)
     , layer_param_(param)
-    , bWeightPerchannel(false)
+    , bWeightPerchannel_(false)
      {
       // Set phase and copy blobs (if there are any).
       phase_ = param.phase();
@@ -341,7 +341,7 @@ class Layer {
   virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {};
 
   inline bool IsPerchannelWeightQuantization() {
-    return bWeightPerchannel;
+    return bWeightPerchannel_;
   }
 
 
@@ -349,7 +349,7 @@ class Layer {
   /** Quantize Inference type of this layer*/
   QuantInferType infer_type_;
   BlobQuantType activation_qtype_;
-  bool bWeightPerchannel;
+  bool bWeightPerchannel_;
 
   /** The protobuf that stores the layer parameters */
   LayerParameter layer_param_;

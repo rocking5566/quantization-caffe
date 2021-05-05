@@ -67,7 +67,7 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
   virtual inline const char* type() const { return "Convolution"; }
 
   virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {
-    this->bWeightPerchannel = bPerchannel;
+    this->bWeightPerchannel_ = bPerchannel;
     thresholds.clear();
     Dtype* weight = this->blobs_[0]->mutable_cpu_data();
     if (!bPerchannel) {
