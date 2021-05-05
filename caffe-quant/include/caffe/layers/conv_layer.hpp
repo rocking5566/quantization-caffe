@@ -77,9 +77,9 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
 
       thresholds.push_back(thr);
     } else {
+      int ihw_size = this->blobs_[0]->shape(1) * this->blobs_[0]->shape(2) * this->blobs_[0]->shape(3);
       for (int i = 0; i < this->blobs_[0]->shape(0); ++i) {
         Dtype thr = INT_MIN;
-        int ihw_size = this->blobs_[0]->shape(1) * this->blobs_[0]->shape(2) * this->blobs_[0]->shape(3);
         Dtype* sub_weight = weight + i * ihw_size;
 
         for (int i = 0; i < ihw_size; ++i)
