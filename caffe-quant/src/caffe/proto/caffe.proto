@@ -251,7 +251,7 @@ message SolverParameter {
   // If command line --weights parameter is specified, it has higher priority
   // and overwrites this one(s).
   // If --snapshot command line parameter is specified, this one(s) are ignored.
-  // If several model files are expected, they can be listed in a one 
+  // If several model files are expected, they can be listed in a one
   // weights parameter separated by ',' (like in a command string) or
   // in repeated weights parameters separately.
   repeated string weights = 42;
@@ -1452,4 +1452,17 @@ message PReLUParameter {
   optional FillerParameter filler = 1;
   // Whether or not slope parameters are shared across channels.
   optional bool channel_shared = 2 [default = false];
+}
+
+// The label (display) name and label id.
+message LabelMapItem {
+  // Both name and label are required.
+  optional string name = 1;
+  optional int32 label = 2;
+  // display_name is optional.
+  optional string display_name = 3;
+}
+
+message LabelMap {
+  repeated LabelMapItem item = 1;
 }
