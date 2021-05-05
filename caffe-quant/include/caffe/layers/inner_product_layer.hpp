@@ -29,6 +29,16 @@ class InnerProductLayer : public Layer<Dtype> {
   virtual inline int ExactNumBottomBlobs() const { return 1; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
+  virtual void CalSymmetricWeightRange(vector<Dtype>& thresholds, bool bPerchannel = false) {
+    thresholds.clear();
+    Dtype* weight = this->blobs_[0]->mutable_cpu_data();
+    Dtype thr = INT_MIN;
+    for (int i = 0; i < this->blobs_[0]->count(); ++i)
+      thr = std::max(thr, std::abs(weight[i]));
+
+    thresholds.push_back(thr);
+  }
+
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);

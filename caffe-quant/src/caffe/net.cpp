@@ -192,6 +192,7 @@ void Net<Dtype>::Init(const NetParameter& in_param) {
   no_need_to_quant_.insert("Python");
 
   support_quant_weight_.insert("Convolution");
+  support_quant_weight_.insert("InnerProduct");
 
   // Set phase from the state.
   phase_ = in_param.state().phase();
