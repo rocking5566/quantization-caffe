@@ -4,8 +4,8 @@ import os
 from model_path import get_caffe_model_path
 from yolov3_util import preprocess, postprocess, draw
 
-img_path = '/workspace/experiment/coco17/testpics/fish-bike.jpg'
-labelmap_file = '/workspace/experiment/coco17/labelmap_coco.prototxt'
+img_path = '/workspace/testpics/fish-bike.jpg'
+labelmap_file = '/workspace/util/dataset/labelmap_coco.prototxt'
 
 g_obj_threshold = 0.3
 g_nms_threshold = 0.5

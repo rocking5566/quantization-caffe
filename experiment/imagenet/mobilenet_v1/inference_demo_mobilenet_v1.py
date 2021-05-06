@@ -7,7 +7,7 @@ import os
 from mobilenet_v1_util import preprocess, postprocess
 from model_path import get_caffe_model_path
 
-img_path = '/workspace/experiment/imagenet/testpics/husky.jpg'
+img_path = '/workspace/testpics/husky.jpg'
 
 
 def inference_from_jpg():

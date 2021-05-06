@@ -30,7 +30,7 @@ def preprocess(img_bgr):
     return x
 
 def postprocess(y, top=5):
-    imagenet_label_path = '/workspace/experiment/imagenet/testpics/imagenet_synset_to_human_label_map.txt'
+    imagenet_label_path = '/workspace/util/dataset/imagenet_synset_to_human_label_map.txt'
     pred = np.squeeze(y)
     e_pred = np.exp(pred - np.max(pred))
     softmax_pred = e_pred / e_pred.sum()
