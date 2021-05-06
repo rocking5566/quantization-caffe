@@ -1,11 +1,8 @@
 import caffe
 import cv2
 import os
+from model_path import get_caffe_model_path
 from yolov3_util import preprocess, postprocess, draw
-
-model_path = '/data/models_zoo/object_detection/yolo_v3/caffe/2019.11.15.01'
-g_caffe_proto = os.path.join(model_path, 'yolov3_bnmerge.prototxt')
-g_caffe_weight = os.path.join(model_path, 'bnmerge.caffemodel')
 
 img_path = '/workspace/experiment/coco17/testpics/fish-bike.jpg'
 labelmap_file = '/workspace/experiment/coco17/labelmap_coco.prototxt'
@@ -17,7 +14,8 @@ g_yolo_h, g_yolo_w = 320, 320
 
 
 def inference_from_jpg():
-    net = caffe.Net(g_caffe_proto, g_caffe_weight, caffe.TEST)
+    proto, weight, _ = get_caffe_model_path('yolo_v3')
+    net = caffe.Net(proto, weight, caffe.TEST)
     net.blobs['data'].reshape(1, 3, g_yolo_h, g_yolo_w)
     caffe.set_mode_gpu()
 
