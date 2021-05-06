@@ -8,10 +8,7 @@ import lmdb
 import numpy as np
 import os
 from mobilenet_v1_util import preprocess, postprocess
-
-g_model_path = '/data/models_zoo/imagenet/mobilenet_v1/caffe/2020.04.08.01'
-g_caffe_proto = os.path.join(g_model_path, 'mobilenet_0.25_bnmerge.prototxt')
-g_caffe_weight = os.path.join(g_model_path, 'mobilenet_0.25_bnmerge.caffemodel')
+from model_path import get_caffe_model_path
 
 data_path = '/data/dataset_zoo/imagenet/ilsvrc12_256'
 nh, nw = 224, 224
@@ -27,7 +24,10 @@ def print_result(image_count, top1_correct_count, top5_correct_count):
 
 if __name__ == "__main__":
     caffe.set_mode_gpu()
-    net = caffe.Net(g_caffe_proto, g_caffe_weight, caffe.TEST)
+    proto, weight, quant_info = get_caffe_model_path('mobilenet_v1_0.25')
+    net = caffe.Net(proto, weight, caffe.TEST)
+    net.PrintQuantInfo()
+
     net.blobs['data'].reshape(batch_size, 3, nh, nw)
 
     image_count = 0

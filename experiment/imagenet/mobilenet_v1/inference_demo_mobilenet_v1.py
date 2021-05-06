@@ -5,18 +5,19 @@ import cv2
 import numpy as np
 import os
 from mobilenet_v1_util import preprocess, postprocess
-
-model_path = '/data/models_zoo/imagenet/mobilenet_v1/caffe/2020.04.08.01'
-g_caffe_proto = os.path.join(model_path, 'mobilenet_0.25_bnmerge.prototxt')
-g_caffe_weight = os.path.join(model_path, 'mobilenet_0.25_bnmerge.caffemodel')
-g_caffe_weight = os.path.join(model_path, 'mobilenet_0.25_bnoutlier_bnmerge.caffemodel')
+from model_path import get_caffe_model_path
 
 img_path = '/workspace/experiment/imagenet/testpics/husky.jpg'
 
 
 def inference_from_jpg():
     caffe.set_mode_gpu()
-    net = caffe.Net(g_caffe_proto, g_caffe_weight, caffe.TEST)
+    proto, weight, quant_info = get_caffe_model_path('mobilenet_v1_0.25')
+    net = caffe.Net(proto, weight, caffe.TEST)
+    # net.import_activation_range(quant_info)
+    # net.init_all_fakequant_int8(True)
+    # fp32_int8_init_from_file(net, 'float_layers.txt')
+    net.PrintQuantInfo()
 
     img_bgr = cv2.imread(img_path)
     x = preprocess(img_bgr)
@@ -27,6 +28,7 @@ def inference_from_jpg():
 
     for pred in postprocess(y):
         print(pred)
+
 
 if __name__ == '__main__':
     inference_from_jpg()
