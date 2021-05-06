@@ -76,6 +76,15 @@ void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
 }
 
 template <typename Dtype>
+void Net<Dtype>::InitAllInferTypeToNative() {
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+    Layer<Dtype>* layer = layers_[layer_id].get();
+    string layer_type = layer->type();
+    layer->set_infer_type(eNative);
+  }
+}
+
+template <typename Dtype>
 void Net<Dtype>::InitAllFakeQuantInt8(bool bPerchannel) {
   for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
     Layer<Dtype>* layer = layers_[layer_id].get();
@@ -116,10 +125,15 @@ void Net<Dtype>::InitFakeQuantInt8(const string& int8_layer_name, bool bPerchann
 }
 
 template <typename Dtype>
-bool Net<Dtype>::IsSupportQuant(const string& layer_name) {
+bool Net<Dtype>::IsSupportQuantByLayerName(const string& layer_name) {
   shared_ptr<Layer<Dtype> > layer = layer_by_name(layer_name);
   string layer_type = layer->type();
   return no_need_to_quant_.count(layer_type) == 0;
+}
+
+template <typename Dtype>
+bool Net<Dtype>::IsSupportQuantWeightByLayerType(const string& layer_type) {
+  return support_quant_weight_.count(layer_type);
 }
 
 template <typename Dtype>
