@@ -17,5 +17,10 @@ def get_caffe_model_path(model_name):
         proto = os.path.join(model_path, 'yolov3_bnmerge.prototxt')
         weight = os.path.join(model_path, 'bnmerge.caffemodel')
         quant_info = '/data/models_zoo/object_detection/yolo_v3/caffe_int8/2020.09.14.02/bmnet_custom_calibration_table.threshold_table'
+    elif model_name == 'retinaface_mnet_0.25':
+        model_path = '/data/models_zoo/face_detection/retinaface_mobilenet/caffe/190529/'
+        proto = os.path.join(model_path, 'mnet_25_opt.prototxt')
+        weight = os.path.join(model_path, 'mnet_25_opt.caffemodel')
+        quant_info = '/data/models_zoo/face_detection/retinaface_mobilenet/caffe_int8/200928/bmnet_custom_calibration_table.threshold_table'
 
     return proto, weight, quant_info
