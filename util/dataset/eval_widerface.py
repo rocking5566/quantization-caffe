@@ -1,0 +1,61 @@
+from gen_widerface_list import widerface_generator
+import numpy as np
+import os
+import subprocess
+
+
+def detect_on_widerface(img_path, wider_face_label, result_folder_path, detect_func):
+    if not os.path.isdir(result_folder_path):
+        os.mkdir(result_folder_path)
+
+    for image, _, img_type, img_name in widerface_generator(wider_face_label, img_path):
+        detect_result_sub_folder = os.path.join(result_folder_path, img_type)
+
+        if not os.path.isdir(detect_result_sub_folder):
+            os.mkdir(detect_result_sub_folder)
+            print(img_type)
+
+        detect_result = os.path.join(detect_result_sub_folder, img_name + '.txt')
+        with open(detect_result, 'w') as fp:
+            pred = detect_func(image)
+            fp.write(img_name + '\n')
+            fp.write(str(pred.shape[0]) + '\n')
+
+            for i in range(pred.shape[0]):
+                face = pred[i]
+                # x, y, w, h, confidence
+                fp.write(str(face[0]) + " " + str(face[1]) + " " +
+                         str(face[2]) + " " + str(face[3]) + " " + str(face[4]) + '\n')
+
+
+def evaluation(pred_folder, model_name):
+    acc_log = "acc.log"
+    wider_eval_tool = '/workspace/experiment/dataset/wider_eval_tools/'
+
+    acc_log_path = os.path.join(wider_eval_tool, acc_log)
+    folder_name = os.path.basename(pred_folder)
+
+    cmd = 'cp -r {} {};'.format(pred_folder, wider_eval_tool)
+    cmd += 'pushd {};'.format(wider_eval_tool)
+    cmd += 'octave --no-window-system --eval \"wider_eval(\'{}\', \'{}\')\" 2>&1 | tee {} ;'.format(folder_name, model_name, acc_log)
+    cmd += 'rm -rf {};'.format(folder_name)
+    cmd += 'popd;'
+    cmd += 'mv {} . ;'.format(acc_log_path)
+    print("exec:{}".format(cmd))
+    subprocess.call(cmd, shell=True, executable='/bin/bash')
+
+
+if __name__ == '__main__':
+    # Following is just sample code of detect_on_widerface()
+    g_wider_face_path = os.path.join(os.environ['DATASET_PATH'], 'widerface')
+    g_img_path = os.path.join(g_wider_face_path, 'WIDER_val/images')
+    g_wider_face_label = \
+        os.path.join(g_wider_face_path, 'wider_face_split/wider_face_val.mat')
+
+
+    def face_detect(image_bgr):
+        return np.zeros((1, 5))
+
+    detect_on_widerface(g_img_path, g_wider_face_label, './result', face_detect)
+    evaluation('./result', 'demo_face')
+
