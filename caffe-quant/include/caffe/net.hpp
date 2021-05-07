@@ -33,6 +33,9 @@ class Net {
   void ImportActivationRange(const string& threshold_table_path);
   void InitAllInferTypeToNative();
   void InitAllFakeQuantInt8(bool bPerchannel=true);
+  void InitFakeQuant(const string& quant_layer_name, BlobQuantType w_qtype,
+    BlobQuantType act_qtype, bool bPerchannel=true);
+  void InitFakeQuantInt4_8(const string& int4_8_layer_name, bool bPerchannel=true);
   void InitFakeQuantInt8(const string& int8_layer_name, bool bPerchannel=true);
   bool IsSupportQuantByLayerName(const string& layer_name);
   bool IsSupportQuantWeightByLayerType(const string& layer_type);

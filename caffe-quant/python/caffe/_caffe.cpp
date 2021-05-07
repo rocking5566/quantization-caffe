@@ -416,6 +416,7 @@ BOOST_PYTHON_MODULE(_caffe) {
     .def("import_activation_range", &Net<Dtype>::ImportActivationRange)
     .def("init_all_infer_type_to_native", &Net<Dtype>::InitAllInferTypeToNative)
     .def("init_all_fakequant_int8", &Net<Dtype>::InitAllFakeQuantInt8)
+    .def("init_fakequant_int4_8", &Net<Dtype>::InitFakeQuantInt4_8)
     .def("init_fakequant_int8", &Net<Dtype>::InitFakeQuantInt8)
     .def("is_support_quant_by_layer_name", &Net<Dtype>::IsSupportQuantByLayerName)
     .def("is_support_quant_weight_by_layer_type", &Net<Dtype>::IsSupportQuantWeightByLayerType)

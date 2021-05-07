@@ -125,8 +125,9 @@ void Net<Dtype>::InitAllFakeQuantInt8(bool bPerchannel) {
 }
 
 template <typename Dtype>
-void Net<Dtype>::InitFakeQuantInt8(const string& int8_layer_name, bool bPerchannel) {
-  shared_ptr<Layer<Dtype> > layer = layer_by_name(int8_layer_name);
+void Net<Dtype>::InitFakeQuant(const string& quant_layer_name, BlobQuantType w_qtype,
+    BlobQuantType act_qtype, bool bPerchannel) {
+  shared_ptr<Layer<Dtype> > layer = layer_by_name(quant_layer_name);
   string layer_type = layer->type();
   vector<Dtype> weightRange;
 
@@ -135,12 +136,22 @@ void Net<Dtype>::InitFakeQuantInt8(const string& int8_layer_name, bool bPerchann
 
   if (support_quant_weight_.count(layer_type) == 1) {
     layer->CalSymmetricWeightRange(weightRange, bPerchannel);
-    layer->set_weight_quant_param(weightRange, eInt8);
+    layer->set_weight_quant_param(weightRange, w_qtype);
     layer->FakeQuantWeight();
   }
   // TODO - fake quantization for bias
-  layer->set_activation_quant_param(eInt8);
+  layer->set_activation_quant_param(act_qtype);
   layer->set_infer_type(eFakeQuant);
+}
+
+template <typename Dtype>
+void Net<Dtype>::InitFakeQuantInt4_8(const string& int4_8_layer_name, bool bPerchannel) {
+  InitFakeQuant(int4_8_layer_name, eInt4, eInt8, bPerchannel);
+}
+
+template <typename Dtype>
+void Net<Dtype>::InitFakeQuantInt8(const string& int8_layer_name, bool bPerchannel) {
+  InitFakeQuant(int8_layer_name, eInt8, eInt8, bPerchannel);
 }
 
 template <typename Dtype>
