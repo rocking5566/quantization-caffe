@@ -20,7 +20,7 @@ class RetinaFace:
         self.fpn_keys = []
         for s in self._feat_stride_fpn:
             self.fpn_keys.append('stride%s'%s)
-        
+
         self._anchors_fpn = dict(zip(self.fpn_keys, \
             generate_anchors_fpn(dense_anchor=False, cfg=self.anchor_cfg)))
         for k in self._anchors_fpn:
@@ -118,7 +118,7 @@ class RetinaFace:
             cls_tensor_name = 'face_rpn_cls_prob_reshape_stride{}'.format(s)
             bbox_tensor_name = 'face_rpn_bbox_pred_stride{}'.format(s)
             pts_tensor_name = 'face_rpn_landmark_pred_stride{}'.format(s)
-            
+
             score_tensor = y[cls_tensor_name]
             bbox_tensor = y[bbox_tensor_name]
             pts_tensor = y[pts_tensor_name]
@@ -181,7 +181,7 @@ class RetinaFace:
         det = det[keep, :]
         landmarks = landmarks[keep]
 
-        return det.astype(np.int), landmarks.astype(np.int)
+        return det, landmarks
 
 
     def draw(self, image, faces, landmarks, verbose=False):
@@ -189,11 +189,13 @@ class RetinaFace:
 
         for i in range(faces.shape[0]):
             box = faces[i]
+            box_int = faces[i].astype(int)
             landmark5 = landmarks[i]
+            landmark5_int = landmark5.astype(int)
 
-            cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (255, 0, 0), 2)
-            for l in range(landmark5.shape[0]):
-                cv2.circle(image, (landmark5[l][0], landmark5[l][1]), 1, (0, 0, 255), 2)
+            cv2.rectangle(image, (box_int[0], box_int[1]), (box_int[2], box_int[3]), (255, 0, 0), 2)
+            for l in range(landmark5_int.shape[0]):
+                cv2.circle(image, (landmark5_int[l][0], landmark5_int[l][1]), 1, (0, 0, 255), 2)
 
             if verbose:
                 print('box coordinate: {0}'.format(box))
