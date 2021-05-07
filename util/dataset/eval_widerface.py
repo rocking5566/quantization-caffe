@@ -8,7 +8,7 @@ def detect_on_widerface(img_path, wider_face_label, result_folder_path, detect_f
     if not os.path.isdir(result_folder_path):
         os.mkdir(result_folder_path)
 
-    for image, _, img_type, img_name in widerface_generator(wider_face_label, img_path):
+    for [image, _, img_type, img_name] in widerface_generator(wider_face_label, img_path):
         detect_result_sub_folder = os.path.join(result_folder_path, img_type)
 
         if not os.path.isdir(detect_result_sub_folder):
@@ -30,7 +30,7 @@ def detect_on_widerface(img_path, wider_face_label, result_folder_path, detect_f
 
 def evaluation(pred_folder, model_name):
     acc_log = "acc.log"
-    wider_eval_tool = '/workspace/experiment/dataset/wider_eval_tools/'
+    wider_eval_tool = '/workspace/util/dataset/wider_eval_tools/'
 
     acc_log_path = os.path.join(wider_eval_tool, acc_log)
     folder_name = os.path.basename(pred_folder)
