@@ -50,6 +50,7 @@ Net<Dtype>::Net(const string& param_file, Phase phase,
 template <typename Dtype>
 void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
   std::ifstream infile(threshold_table_path);
+  std::map<Layer<Dtype>*, float> threshold_table;
   string line;
   std::regex sym_pattern("[a-zA-Z0-9.:;_\\/-]+ [-0-9.e]+");
   std::regex asym_pattern("[a-zA-Z0-9.:;_\\/-]+ [-0-9.e]+ [-0-9.e]+");
@@ -66,12 +67,30 @@ void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
           for (int i = 0; i < top_blobs.size(); ++i) {
             top_blobs[i]->SetQuantizationRange(threshold);
           }
+          threshold_table[layer_ptr.get()] = threshold;
         }
       } else if (regex_match(line, asym_pattern)) {
         LOG(FATAL) << "Not Support asymmetric quantization so far";
       } else {
         LOG(FATAL) << line << std::endl << "not match required format";
       }
+  }
+
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+    Layer<Dtype>* layer = layers_[layer_id].get();
+    string layer_type = layer->type();
+    if (layer_type == "Split") {
+      Layer<Dtype>* prev_layer = bottom_vecs_[layer_id][0]->parent_layer();
+      if (threshold_table.count(prev_layer)) {
+        float threshold_x = threshold_table[prev_layer];
+        vector<Blob<Dtype>*> top_blobs = top_vecs_[layer_id];
+        for (int i = 0; i < top_blobs.size(); ++i) {
+          top_blobs[i]->SetQuantizationRange(threshold_x);
+        }
+      }
+      else
+        LOG(FATAL) << "We cannot SetQuantizationRange() of split layer";
+    }
   }
 }
 
