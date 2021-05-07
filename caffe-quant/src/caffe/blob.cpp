@@ -5,6 +5,7 @@
 #include "caffe/common.hpp"
 #include "caffe/syncedmem.hpp"
 #include "caffe/util/math_functions.hpp"
+#include "caffe/layer.hpp"
 
 namespace caffe {
 
@@ -64,7 +65,8 @@ Blob<Dtype>::Blob(const int num, const int channels, const int height,
     const int width)
   // capacity_ must be initialized before calling Reshape
   : capacity_(0)
-  , quant_type_(eFp32) {
+  , quant_type_(eFp32)
+  , parent_layer_(NULL) {
   Reshape(num, channels, height, width);
 }
 
@@ -72,7 +74,8 @@ template <typename Dtype>
 Blob<Dtype>::Blob(const vector<int>& shape)
   // capacity_ must be initialized before calling Reshape
   : capacity_(0)
-  , quant_type_(eFp32) {
+  , quant_type_(eFp32)
+  , parent_layer_(NULL) {
   Reshape(shape);
 }
 
@@ -553,6 +556,11 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
       proto->add_diff(diff_vec[i]);
     }
   }
+}
+
+template <typename Dtype>
+void Blob<Dtype>::SetParentPalyer(Layer<Dtype>* layer) {
+  parent_layer_ = layer;
 }
 
 template <typename Dtype>

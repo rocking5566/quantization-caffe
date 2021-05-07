@@ -299,6 +299,7 @@ void Net<Dtype>::Init(const NetParameter& in_param) {
             << "    with loss weight " << layer->loss(top_id);
       }
       memory_used_ += top_vecs_[layer_id][top_id]->count();
+      top_vecs_[layer_id][top_id]->SetParentPalyer(layer);
     }
     LOG_IF(INFO, Caffe::root_solver())
         << "Memory required for data: " << memory_used_ * sizeof(Dtype);

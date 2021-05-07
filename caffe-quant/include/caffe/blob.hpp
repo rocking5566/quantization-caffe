@@ -13,6 +13,7 @@
 const int kMaxBlobAxes = 32;
 
 namespace caffe {
+template <typename Dtype> class Layer;
 
 /**
  * @brief A wrapper around SyncedMemory holders serving as the basic
@@ -25,7 +26,7 @@ template <typename Dtype>
 class Blob {
  public:
   Blob()
-       : data_(), diff_(), count_(0), capacity_(0), quant_type_(eFp32) {}
+       : data_(), diff_(), count_(0), capacity_(0), quant_type_(eFp32), parent_layer_(NULL) {}
 
   /// @brief Deprecated; use <code>Blob(const vector<int>& shape)</code>.
   explicit Blob(const int num, const int channels, const int height,
@@ -266,6 +267,11 @@ class Blob {
   void ShareDiff(const Blob& other);
 
   bool ShapeEquals(const BlobProto& other);
+  void SetParentPalyer(Layer<Dtype>* layer);
+  inline Layer<Dtype>* parent_layer() {
+    return parent_layer_;
+  }
+
   void SetQuantizationRange(Dtype threshold);
   void SetQuantizationRange(const vector<Dtype>& thresholds);
   void SetQuantizationRange(Dtype max, Dtype min);
@@ -289,6 +295,7 @@ class Blob {
   vector<Dtype> qmax_;
   vector<Dtype> qmin_;
   BlobQuantType quant_type_;
+  Layer<Dtype>* parent_layer_;
 
   DISABLE_COPY_AND_ASSIGN(Blob);
 };  // class Blob
