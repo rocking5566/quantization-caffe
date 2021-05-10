@@ -12,12 +12,8 @@ img_path = '/workspace/testpics/husky.jpg'
 
 def inference_from_jpg():
     caffe.set_mode_gpu()
-    proto, weight, quant_info = get_caffe_model_path('mobilenet_v1_0.25')
+    proto, weight, _ = get_caffe_model_path('mobilenet_v1_0.25')
     net = caffe.Net(proto, weight, caffe.TEST)
-    # net.import_activation_range(quant_info)
-    # net.init_all_fakequant_int8(True)
-    # fp32_int8_init_from_file(net, 'float_layers.txt')
-    net.PrintQuantInfo()
 
     img_bgr = cv2.imread(img_path)
     x = preprocess(img_bgr)
