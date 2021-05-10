@@ -14,11 +14,16 @@ def int8_init(net, quant_info, perchanel=True):
         net.init_fakequant_int8(layer_name, perchanel)
     net.PrintQuantInfo()
 
-def fp32_int8_init(net, fp32_layers=[], perchanel=True):
+def fp32_int8_init(net, quant_info, fp32_layers=[], perchanel=True):
+    net.import_activation_range(quant_info)
     for layer_name in net._layer_names:
         if layer_name not in fp32_layers:
             net.init_fakequant_int8(layer_name, perchanel)
 
-def fp32_int8_init_from_file(net, fp32_layers_file, perchanel=True):
+    net.PrintQuantInfo()
+
+
+def fp32_int8_init_from_file(net, quant_info, fp32_layers_file, perchanel=True):
+    net.import_activation_range(quant_info)
     fp32_layers = np.loadtxt(fp32_layers_file, str, delimiter='\t')
-    fp32_int8_init(net, fp32_layers, perchanel)
+    fp32_int8_init(net, quant_info, fp32_layers, perchanel)
