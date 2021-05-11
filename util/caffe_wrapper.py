@@ -2,6 +2,10 @@ from __future__ import division
 import numpy as np
 
 
+def init_all_infer_type_to_native(net):
+    for layer_name in net._layer_names:
+        net.set_infer_type_to_native(layer_name)
+
 def int4_8_init(net, quant_info, perchanel=True):
     net.import_activation_range(quant_info)
     for layer_name in net._layer_names:

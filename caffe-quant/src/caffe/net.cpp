@@ -95,12 +95,9 @@ void Net<Dtype>::ImportActivationRange(const string& threshold_table_path) {
 }
 
 template <typename Dtype>
-void Net<Dtype>::InitAllInferTypeToNative() {
-  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
-    Layer<Dtype>* layer = layers_[layer_id].get();
-    string layer_type = layer->type();
-    layer->set_infer_type(eNative);
-  }
+void Net<Dtype>::SetInferTypeToNative(const string& layer_name) {
+  shared_ptr<Layer<Dtype> > layer = layer_by_name(layer_name);
+  layer->set_infer_type(eNative);
 }
 
 template <typename Dtype>

@@ -1,4 +1,5 @@
 import caffe
+from caffe_wrapper import init_all_infer_type_to_native
 from caffe.proto import caffe_pb2
 import copy
 import cv2
@@ -109,7 +110,7 @@ class LayerLoss(object):
 
             # Reset inference type from fakequant to native
             # Restore weight before fakequant weight
-            net.init_all_infer_type_to_native()
+            init_all_infer_type_to_native(net)
             if net.is_support_quant_weight_by_layer_type(layer_type):
                 net.params[layer_name][0].data[...] = weight
 

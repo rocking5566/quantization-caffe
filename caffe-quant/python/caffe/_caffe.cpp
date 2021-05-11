@@ -414,7 +414,7 @@ BOOST_PYTHON_MODULE(_caffe) {
     .def("PrintQuantInfo", &Net<Dtype>::PrintQuantInfo)
     .def("ExportQuantInfo", &Net<Dtype>::ExportQuantInfo)
     .def("import_activation_range", &Net<Dtype>::ImportActivationRange)
-    .def("init_all_infer_type_to_native", &Net<Dtype>::InitAllInferTypeToNative)
+    .def("set_infer_type_to_native", &Net<Dtype>::SetInferTypeToNative)
     .def("init_all_fakequant_int8", &Net<Dtype>::InitAllFakeQuantInt8)
     .def("init_fakequant_int4_8", &Net<Dtype>::InitFakeQuantInt4_8)
     .def("init_fakequant_int8", &Net<Dtype>::InitFakeQuantInt8)

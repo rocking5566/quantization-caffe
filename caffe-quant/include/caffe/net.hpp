@@ -31,7 +31,7 @@ class Net {
 
   // Quantization related funtion
   void ImportActivationRange(const string& threshold_table_path);
-  void InitAllInferTypeToNative();
+  void SetInferTypeToNative(const string& layer_name);
   void InitAllFakeQuantInt8(bool bPerchannel=true);
   void InitFakeQuant(const string& quant_layer_name, BlobQuantType w_qtype,
     BlobQuantType act_qtype, bool bPerchannel=true);
