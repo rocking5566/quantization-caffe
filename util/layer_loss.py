@@ -36,7 +36,7 @@ class LayerLoss(object):
         self.quant_table = quant_table
         self.input_blob_name = input_blob_name
         self.quant_type = quant_type
-        assert(quant_type in ['int8'])
+        assert(quant_type in ['int8', 'int4_8'])
 
     def predict(self, image_list, val_data_count=100, preprocess=None, loss_func=generic_loss):
         caffe.set_mode_gpu()
@@ -80,6 +80,8 @@ class LayerLoss(object):
 
             if self.quant_type == 'int8':
                 net.init_fakequant_int8(layer_name, True)
+            elif self.quant_type == 'int4_8':
+                net.init_fakequant_int4_8(layer_name, True)
             else:
                 raise Exception(
                     'Not support quant_type {}'.format(self.quant_type))
@@ -107,6 +109,7 @@ class LayerLoss(object):
 
             loss_list.append(
                 (layer.name, layer_index, layer.type, loss / val_data_count))
+            print('loss of {} = {}'.format(layer_name, loss / val_data_count))
 
             # Reset inference type from fakequant to native
             # Restore weight before fakequant weight
