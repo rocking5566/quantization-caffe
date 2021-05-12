@@ -97,3 +97,5 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+*.log
+*.mat
