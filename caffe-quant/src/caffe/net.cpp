@@ -225,6 +225,7 @@ void Net<Dtype>::ExportQuantInfo(const string &quant_info_file) {
 
 template <typename Dtype>
 void Net<Dtype>::Init(const NetParameter& in_param) {
+  no_need_to_quant_.insert("Input");
   no_need_to_quant_.insert("Split");
   no_need_to_quant_.insert("Reshape");
   no_need_to_quant_.insert("Flatten");
