@@ -17,6 +17,7 @@ class Base_Calibrator(object):
         with open(image_list, 'r') as fp:
             self.images = fp.read().splitlines()
 
+        caffe.set_mode_gpu()
         if len(self.images) == 0:
             raise IOError("ERROR: No calibration image detect.")
 
@@ -59,8 +60,10 @@ class Base_Calibrator(object):
                     min_value = np.min(activation)
                     max_value = np.max(activation)
                     self.tensor_min_max_dict[layer_name] = (
-                        min(self.tensor_min_max_dict[layer_name][0], min_value),
-                        max(self.tensor_min_max_dict[layer_name][1], max_value),
+                        min(self.tensor_min_max_dict[layer_name]
+                            [0], min_value),
+                        max(self.tensor_min_max_dict[layer_name]
+                            [1], max_value),
                     )
 
         pbar.close()
@@ -70,12 +73,13 @@ class Base_Calibrator(object):
             if _max == 0:
                 # customer may have network output all zero, change it to 1e-5 for them.
                 print("WARNING: layer {} is all zeros. Please check the input data "
-                                "correctness.".format(layer_name))
+                      "correctness.".format(layer_name))
                 _max = 1e-5
                 self.tensor_min_max_dict[layer_name] = (_min, _max)
 
             if self.is_symmetric_quantization:
-                self.tensor_min_max_dict[layer_name] = max(abs(_min), abs(_max))
+                self.tensor_min_max_dict[layer_name] = max(
+                    abs(_min), abs(_max))
 
         return self.tensor_min_max_dict
 
