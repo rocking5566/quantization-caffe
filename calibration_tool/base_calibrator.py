@@ -2,7 +2,8 @@ import abc
 import caffe
 import cv2
 import numpy as np
-import math
+from tqdm import tqdm
+
 
 class Base_Calibrator(object):
     def __init__(self,
@@ -31,7 +32,14 @@ class Base_Calibrator(object):
                 self.tensor_min_max_dict[layer_name] = (0, 0)
 
     def do_calibration(self):
-        for img_id, img_path in enumerate(self.images):
+        pbar = tqdm(self.images, total=self.image_count,
+                    position=0, leave=True)
+
+        for img_id, img_path in enumerate(pbar):
+            pbar.set_description(
+                "calculate min and max: {}".format(img_path.split("/")[-1]))
+            pbar.update(1)
+
             if img_id >= self.image_count:
                 break
 
@@ -54,6 +62,8 @@ class Base_Calibrator(object):
                         min(self.tensor_min_max_dict[layer_name][0], min_value),
                         max(self.tensor_min_max_dict[layer_name][1], max_value),
                     )
+
+        pbar.close()
 
         # check max is zero
         for layer_name, (_min, _max) in self.tensor_min_max_dict.items():
