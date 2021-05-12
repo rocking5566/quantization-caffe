@@ -53,29 +53,28 @@ class KLD_Calibrator(Base_Calibrator):
             self.net.forward()
 
             for layer_id, layer_name in enumerate(self.net._layer_names):
-                if self.net.is_support_quant_by_layer_name(layer_name):
-                    top_blob_id = self.net._top_ids(layer_id)[0]
-                    top_name = self.net._blob_names[top_blob_id]
-                    activation = self.net.blobs[top_name].data
-                    t = np.abs(activation.flatten())
-                    t = t[t != 0]
+                top_blob_id = self.net._top_ids(layer_id)[0]
+                top_name = self.net._blob_names[top_blob_id]
+                activation = self.net.blobs[top_name].data
+                t = np.abs(activation.flatten())
+                t = t[t != 0]
 
-                    width = data_max[layer_name] / (self.histogram_bin_num - 1)
-                    if t.size > 0:
-                        hist, _ = np.histogram(np.floor(t / width + 0.5),
-                                               bins=self.histogram_bin_num,
-                                               range=(
-                            0, self.histogram_bin_num-1),
-                            density=False)
-                    else:
-                        hist = np.zeros(self.histogram_bin_num)
+                width = data_max[layer_name] / (self.histogram_bin_num - 1)
+                if t.size > 0:
+                    hist, _ = np.histogram(np.floor(t / width + 0.5),
+                                            bins=self.histogram_bin_num,
+                                            range=(
+                        0, self.histogram_bin_num-1),
+                        density=False)
+                else:
+                    hist = np.zeros(self.histogram_bin_num)
 
-                    hist = hist.astype(np.int32)
-                    if layer_name not in data_hist:
-                        data_hist[layer_name] = hist
-                        width_hist[layer_name] = width
-                    else:
-                        data_hist[layer_name] += hist
+                hist = hist.astype(np.int32)
+                if layer_name not in data_hist:
+                    data_hist[layer_name] = hist
+                    width_hist[layer_name] = width
+                else:
+                    data_hist[layer_name] += hist
 
         pbar.close()
         return data_hist, width_hist
@@ -90,7 +89,7 @@ class KLD_Calibrator(Base_Calibrator):
             pbar.set_description(
                 "calculate threshold from kld histogram: {}".format(layer_name))
             pbar.update(1)
-            thresholds[layer_name] = self.KLD_hist(
-                data_hist[layer_name], width_hist[layer_name])
+            thresholds[layer_name] = [self.KLD_hist(
+                data_hist[layer_name], width_hist[layer_name])]
 
         return thresholds

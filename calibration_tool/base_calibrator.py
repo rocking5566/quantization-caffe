@@ -29,8 +29,7 @@ class Base_Calibrator(object):
         self.tensor_min_max_dict = dict()
 
         for layer_name in self.net._layer_names:
-            if self.net.is_support_quant_by_layer_name(layer_name):
-                self.tensor_min_max_dict[layer_name] = (0, 0)
+            self.tensor_min_max_dict[layer_name] = (0, 0)
 
     def do_calibration(self):
         pbar = tqdm(self.images, total=self.image_count,
@@ -52,19 +51,18 @@ class Base_Calibrator(object):
             self.net.forward()
 
             for layer_id, layer_name in enumerate(self.net._layer_names):
-                if self.net.is_support_quant_by_layer_name(layer_name):
-                    top_blob_id = self.net._top_ids(layer_id)[0]
-                    top_name = self.net._blob_names[top_blob_id]
-                    activation = self.net.blobs[top_name].data
+                top_blob_id = self.net._top_ids(layer_id)[0]
+                top_name = self.net._blob_names[top_blob_id]
+                activation = self.net.blobs[top_name].data
 
-                    min_value = np.min(activation)
-                    max_value = np.max(activation)
-                    self.tensor_min_max_dict[layer_name] = (
-                        min(self.tensor_min_max_dict[layer_name]
-                            [0], min_value),
-                        max(self.tensor_min_max_dict[layer_name]
-                            [1], max_value),
-                    )
+                min_value = np.min(activation)
+                max_value = np.max(activation)
+                self.tensor_min_max_dict[layer_name] = (
+                    min(self.tensor_min_max_dict[layer_name]
+                        [0], min_value),
+                    max(self.tensor_min_max_dict[layer_name]
+                        [1], max_value),
+                )
 
         pbar.close()
 
@@ -83,6 +81,13 @@ class Base_Calibrator(object):
 
         return self.tensor_min_max_dict
 
-    @abc.abstractmethod
-    def create_threshold_table(self):
-        return NotImplemented
+    def dump_threshold_table(self, threshold_table, calibration_table_file):
+         with open(calibration_table_file, 'w') as writer:
+            for layer_name, threshold in threshold_table.items():
+                if self.is_symmetric_quantization:
+                    line = layer_name + ' ' + str(threshold[0])
+                else:
+                    line = layer_name + ' ' + str(threshold[0]) + ' ' + str(threshold[1])
+                print(line)
+                writer.write(line + '\n')
+
