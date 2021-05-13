@@ -1,5 +1,6 @@
 import abc
 import caffe
+from caffe_wrapper import Net_Helper
 import cv2
 import numpy as np
 from tqdm import tqdm
@@ -81,6 +82,33 @@ class Base_Calibrator(object):
 
         return self.tensor_min_max_dict
 
+    def threshold_opt(self, threshold_table):
+        if not self.is_symmetric_quantization:
+            raise RuntimeError(
+                "threshold_opt only support symmetric quantization")
+
+        threshold_table_opt = dict()
+        for k, v in threshold_table.items():
+            threshold_table_opt[k] = v
+
+        # TODO - Check pooling.
+        # There are global average pooling in mobilenet_v1_0.25.
+        # If I remove global average pooling from is_override_prev_threshold
+        # Top 1 of mobilenet_v1_0.25 imrpove 0.37694 from 0.37078.
+        is_override_prev_threshold = ['Flatten', 'Permute', 'PixelShuffle', 'Reshape', 'Crop', 'ReLU']
+        net = Net_Helper(self.net)
+        for layer_id, layer_name in enumerate(self.net._layer_names):
+            cur_layer_type = net.layer_type(layer_id)
+            cur_layer_id = layer_id
+            while cur_layer_type in is_override_prev_threshold:
+                prev_layer_id = net.get_prev_layer(cur_layer_id)[0]
+                prev_layer_name =net.layer_name(prev_layer_id)
+                threshold_table_opt[prev_layer_name] = threshold_table_opt[layer_name]
+                cur_layer_type = net.layer_type(prev_layer_id)
+                cur_layer_id = prev_layer_id
+
+        return threshold_table_opt
+
     def dump_threshold_table(self, threshold_table, calibration_table_file):
          with open(calibration_table_file, 'w') as writer:
             for layer_name, threshold in threshold_table.items():
@@ -90,4 +118,3 @@ class Base_Calibrator(object):
                     line = layer_name + ' ' + str(threshold[0]) + ' ' + str(threshold[1])
                 print(line)
                 writer.write(line + '\n')
-

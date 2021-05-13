@@ -15,4 +15,5 @@ if __name__ == '__main__':
         image_count=100, preprocess=preprocess, histogram_bin_num=20480)
 
     threshold_table = calibrator.do_calibration()
+    threshold_table = calibrator.threshold_opt(threshold_table)
     calibrator.dump_threshold_table(threshold_table, 'mobilenet_v1_0.25.threshold_table')
