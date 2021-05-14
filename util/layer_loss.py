@@ -1,5 +1,5 @@
 import caffe
-from caffe_wrapper import init_all_infer_type_to_native
+from caffe_wrapper import Net_Helper
 from caffe.proto import caffe_pb2
 import copy
 import cv2
@@ -41,6 +41,7 @@ class LayerLoss(object):
     def predict(self, image_list, val_data_count=100, preprocess=None, loss_func=generic_loss):
         caffe.set_mode_gpu()
         net = caffe.Net(self.proto, self.weight, caffe.TEST)
+        net_helper = Net_Helper(net)
         net.import_activation_range(self.quant_table)
         loss_list = list()
         pred_fp32 = list()
@@ -113,7 +114,7 @@ class LayerLoss(object):
 
             # Reset inference type from fakequant to native
             # Restore weight before fakequant weight
-            init_all_infer_type_to_native(net)
+            net_helper.init_all_infer_type_to_native()
             if net.is_support_quant_weight_by_layer_type(layer_type):
                 net.params[layer_name][0].data[...] = weight
 

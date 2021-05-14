@@ -78,6 +78,10 @@ class Net_Helper(object):
 
         return target_mac, total_mac
 
+    def init_all_infer_type_to_native(self):
+        for layer_name in self.net._layer_names:
+            self.net.set_infer_type_to_native(layer_name)
+
     def int4_8_init(self, quant_info, perchanel=True):
         self.net.import_activation_range(quant_info)
         for layer_name in self.net._layer_names:
@@ -119,8 +123,3 @@ class Net_Helper(object):
         int8_layers = np.loadtxt(int8_layers_file, str, delimiter='\t')
         int4_8_layer = np.loadtxt(int4_8_layer_file, str, delimiter='\t')
         self.quant_init(quant_info, int8_layers, int4_8_layer, perchanel)
-
-
-def init_all_infer_type_to_native(net):
-    for layer_name in net._layer_names:
-        net.set_infer_type_to_native(layer_name)
