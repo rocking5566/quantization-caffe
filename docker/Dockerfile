@@ -97,8 +97,9 @@ RUN apt-get update && apt install -y fuse libnss3 libgtk-3-0
 ENV BUILD_ROOT=/workspace/build
 ENV UTIL=/workspace/util
 ENV CALIBRATION_TOOL=/workspace/calibration_tool
+ENV ROOT=/workspace/
 
 ENV PYCAFFE_ROOT $BUILD_ROOT/caffe/install/python
-ENV PYTHONPATH $PYCAFFE_ROOT:$UTIL:$CALIBRATION_TOOL:$PYTHONPATH
+ENV PYTHONPATH $PYCAFFE_ROOT:$UTIL:$CALIBRATION_TOOL:$ROOT:$PYTHONPATH
 ENV PATH $PYCAFFE_ROOT/tools:$PYCAFFE_ROOT:$PATH
 RUN echo "$PYCAFFE_ROOT/install/lib/" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
