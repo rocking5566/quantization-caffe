@@ -35,6 +35,49 @@ class Net_Helper(object):
         bottom_blob_ids = self.net._bottom_ids(layer_id)
         return [self.blob_source[id] for id in bottom_blob_ids]
 
+    def conv_mac_count(self, target_layer_list, verbose=True):
+        total_mac = 0
+        target_mac = 0
+
+        for layer_id, layer_name in enumerate(self.net._layer_names):
+            layer_type = self.layer_type(layer_id)
+            if layer_type == 'Convolution':
+                # OIHW
+                w = self.net.params[layer_name][0].data[...]
+                # NCHW
+                x = self.net.blobs[self.bottom_blobs_name(layer_id)[
+                    0]].data[...]
+                y = self.net.blobs[self.top_blobs_name(layer_id)[0]].data[...]
+
+                kh = w.shape[2]
+                kw = w.shape[3]
+                cin = x.shape[1]
+                cout = y.shape[1]
+                oh = y.shape[2]
+                ow = y.shape[3]
+
+                if cin != w.shape[1]:
+                    if (w.shape[1] != 1):
+                        raise RuntimeError(
+                            "Only support depthwise convolution")
+                    # Depthwise Convolution
+                    mac = kh * kw * oh * ow * cin
+                else:
+                    mac = kh * kw * cin * cout * oh * ow
+
+                total_mac += mac
+
+                if layer_name in target_layer_list:
+                    target_mac += mac
+
+        if verbose:
+            print('target layer = {}'.format(target_layer_list))
+            print('target_mac / total_mac = {}'.format(target_mac / total_mac))
+            print('target_mac = {}'.format(target_mac))
+            print('total_mac = {}'.format(total_mac))
+
+        return target_mac, total_mac
+
 
 def init_all_infer_type_to_native(net):
     for layer_name in net._layer_names:
