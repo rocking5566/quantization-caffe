@@ -1,10 +1,7 @@
 from __future__ import division
 
 import caffe
-from caffe.proto import caffe_pb2
 import cv2
-from google.protobuf import text_format
-import lmdb
 import numpy as np
 import os
 from mobilenet_v1_util import preprocess, postprocess
