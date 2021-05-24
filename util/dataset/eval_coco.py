@@ -1,15 +1,13 @@
-import caffe
-import cv2
 from dataset.gen_coco_list import coco_generator
 import json
 import numpy as np
+import random
 from tqdm import tqdm
-from yolov3_util import preprocess, postprocess, draw
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
 coco_annotation = '/data/dataset_zoo/coco2017/annotations/instances_val2017.json'
-coco_result_file = './coco_results.json'
+coco_result_file = './coco_results{}.json'.format(random.randint(0, 1000))
 g_val_data_count = 5000
 
 
