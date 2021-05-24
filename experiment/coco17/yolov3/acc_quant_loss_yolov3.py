@@ -33,6 +33,7 @@ if __name__ == '__main__':
         return batched_pred[0]
 
     acc_list = list()
+    recall_list = list()
     for layer_id, layer_name in enumerate(net._layer_names):
         layer_type = net_helper.layer_type(layer_id)
         if not net.is_support_quant_by_layer_name(layer_name):
@@ -54,10 +55,12 @@ if __name__ == '__main__':
         print('Calculate loss of {}...'.format(layer_name))
 
         result = coco_evaluation(caffe_detect, g_val_data_count)
-        map75 = result[2]
-        # map50 = result[1]
-        acc_list.append((layer_name, layer_id, layer_type, map75))
-        print('loss of {} = {}'.format(layer_name, map75))
+        # map75 = result[2]
+        map50 = result[1]
+        recall = result[6]
+        acc_list.append((layer_name, layer_id, layer_type, map50))
+        recall_list.append((layer_name, layer_id, layer_type, recall))
+        print('loss of {} = {}'.format(layer_name, map50))
         # Reset inference type from fakequant to native
         # Restore weight before fakequant weight
         net_helper.init_all_infer_type_to_native()
@@ -70,5 +73,16 @@ if __name__ == '__main__':
     print('{:>12}\t{:>8}\t{:>12}\t{:>20}'.format(
             'Layer Name', 'Layer ID', 'Layer Type', 'Loss'))
     for acc in acc_list:
+        print('{:>12}\t{:>8}\t{:>12}\t{:>20}'.format(
+            acc[0], acc[1], acc[2], acc[3]))
+
+
+    print('------------------------recall---------------------------')
+    recall_list = sorted(recall_list, cmp=lambda x,
+                        y: cmp(x[3], y[3]), reverse=False)
+
+    print('{:>12}\t{:>8}\t{:>12}\t{:>20}'.format(
+            'Layer Name', 'Layer ID', 'Layer Type', 'Loss'))
+    for acc in recall_list:
         print('{:>12}\t{:>8}\t{:>12}\t{:>20}'.format(
             acc[0], acc[1], acc[2], acc[3]))
